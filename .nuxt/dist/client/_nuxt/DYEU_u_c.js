@@ -1,0 +1,1 @@
+import{a1 as a,$ as r,r as s,u,t as o}from"./DbuVCImx.js";function i(e){const t=e||r();return t?.ssrContext?.head||t?.runWithContext(()=>{if(s())return u(o)})}function x(e,t={}){const n=i(t.nuxt);if(n)return a(e,{head:n,...t})}export{x as u};

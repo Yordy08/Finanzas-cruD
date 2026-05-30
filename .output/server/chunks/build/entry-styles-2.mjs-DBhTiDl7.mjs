@@ -1,4 +1,0 @@
-const VApp = "@layer vuetify-components{.v-application{background:rgb(var(--v-theme-background));color:color-mix(in srgb,rgb(var(--v-theme-on-background)) calc(var(--v-high-emphasis-opacity)*100%),transparent);display:flex}.v-application__wrap{backface-visibility:hidden;display:flex;flex:1 1 auto;flex-direction:column;max-width:100%;min-height:100vh;min-height:100dvh;position:relative}}";
-
-export { VApp as V };
-//# sourceMappingURL=entry-styles-2.mjs-DBhTiDl7.mjs.map

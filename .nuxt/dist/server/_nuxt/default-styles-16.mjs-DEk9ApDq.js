@@ -1,5 +1,0 @@
-const AppSidebar_vue_vue_type_style_index_0_scoped_c9296b4c_lang = ".appSidebarDrawer[data-v-c9296b4c]{background:#050a16b8!important;border-right:1px solid hsla(0,0%,100%,.06);box-shadow:none}.sidebarTop[data-v-c9296b4c]{display:flex;flex-direction:column;gap:12px;padding:14px 12px 8px}.sidebarToggle[data-v-c9296b4c]{align-self:center;border:1px solid hsla(0,0%,100%,.08);border-radius:14px;color:#ffffffe6;height:40px;width:40px}.userBlock[data-v-c9296b4c]{align-items:center;background:#ffffff08;border:1px solid hsla(0,0%,100%,.06);border-radius:16px;display:flex;gap:10px;padding:10px}.userAvatar[data-v-c9296b4c]{background:linear-gradient(135deg,#22d3eecc,#6366f1cc);border-radius:14px;height:34px;width:34px}.userName[data-v-c9296b4c]{font-size:13px;font-weight:900}.userRole[data-v-c9296b4c]{font-size:12px;font-weight:700;opacity:.75}.navList[data-v-c9296b4c]{padding-top:0}.navItem[data-v-c9296b4c]{margin:4px 8px}.navIcon[data-v-c9296b4c]{height:24px;width:24px}";
-export {
-  AppSidebar_vue_vue_type_style_index_0_scoped_c9296b4c_lang as default
-};
-//# sourceMappingURL=default-styles-16.mjs-DEk9ApDq.js.map
