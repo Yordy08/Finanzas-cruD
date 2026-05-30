@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import vuetify from 'vite-plugin-vuetify'
 
 export default defineNuxtConfig({
   devtools: {
@@ -8,23 +9,29 @@ export default defineNuxtConfig({
 
   modules: ['@pinia/nuxt', '@vite-pwa/nuxt'],
 
-css: [
-  'vuetify/styles'
-],
+  css: ['vuetify/styles'],
+
+  build: {
+    transpile: ['vuetify']
+  },
+
+  vite: {
+    plugins: [vuetify()]
+  },
 
   runtimeConfig: {
     databaseUrl:
       process.env.DATABASE_URL ||
       process.env.DOTENV_DATABASE_URL ||
-      (process.env.NUXT_PUBLIC_DATABASE_URL as any) ||
-      undefined,
-
+      process.env.NUXT_PUBLIC_DATABASE_URL,
 
     public: {
       appName: 'Finanzas CRUD',
       version: (() => {
         try {
-          const pkg = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf-8'))
+          const pkg = JSON.parse(
+            readFileSync(join(process.cwd(), 'package.json'), 'utf-8')
+          )
           return pkg?.version || '0.0.0'
         } catch {
           return '0.0.0'
@@ -57,21 +64,22 @@ css: [
       display: 'standalone',
       scope: '/',
       start_url: '/',
+
       icons: [
         {
-          src: '/public/logo.png',
+          src: '/logo.png',
           sizes: '64x64',
           type: 'image/png',
           purpose: 'any'
         },
         {
-          src: '/public/logo.png',
+          src: '/logo.png',
           sizes: '192x192',
           type: 'image/png',
           purpose: 'any'
         },
         {
-          src: '/public/logo.png',
+          src: '/logo.png',
           sizes: '512x512',
           type: 'image/png',
           purpose: 'any'
@@ -82,6 +90,7 @@ css: [
     workbox: {
       navigateFallback: '/',
       globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest,json}'],
+
       runtimeCaching: [
         {
           urlPattern: /^https:\/\/(.*)\/api\//,
@@ -110,4 +119,3 @@ css: [
     }
   }
 })
-
