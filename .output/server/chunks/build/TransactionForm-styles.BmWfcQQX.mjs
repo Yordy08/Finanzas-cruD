@@ -1,0 +1,8 @@
+const TransactionForm_vue_vue_type_style_index_0_scoped_a3d3b7bc_lang = ".form[data-v-a3d3b7bc]{display:flex;flex-direction:column;gap:10px}.row[data-v-a3d3b7bc]{display:grid;gap:10px;grid-template-columns:1fr 1fr}@media(max-width:720px){.row[data-v-a3d3b7bc]{grid-template-columns:1fr}}.label[data-v-a3d3b7bc]{display:flex;flex-direction:column;font-size:13px;font-weight:600;gap:6px}.input[data-v-a3d3b7bc]{background:#00000040;border:1px solid hsla(0,0%,100%,.14);border-radius:12px;color:#fff;outline:none;padding:10px}.input[data-v-a3d3b7bc]::-moz-placeholder{color:#fff9}.input[data-v-a3d3b7bc]::placeholder{color:#fff9}.actions[data-v-a3d3b7bc]{display:flex;justify-content:flex-end}.btn[data-v-a3d3b7bc]{background:#2563eb;border:none;border-radius:12px;color:#fff;font-weight:800;padding:10px 14px}.btn[data-v-a3d3b7bc]:disabled{opacity:.5}.error[data-v-a3d3b7bc]{color:#fb7185;font-weight:700;margin:0}";
+
+const TransactionFormStyles_BmWfcQQX = [
+  TransactionForm_vue_vue_type_style_index_0_scoped_a3d3b7bc_lang
+];
+
+export { TransactionFormStyles_BmWfcQQX as default };
+//# sourceMappingURL=TransactionForm-styles.BmWfcQQX.mjs.map
