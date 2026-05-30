@@ -8,19 +8,9 @@ export default defineNuxtConfig({
 
   modules: ['@pinia/nuxt', '@vite-pwa/nuxt'],
 
-  // Vuetify integration
-  vite: {
-    plugins: [
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (require('vite-plugin-vuetify') as any)({
-        autoImport: true
-      })
-    ]
-  },
-
-  build: {
-    transpile: ['vuetify']
-  },
+css: [
+  'vuetify/styles'
+],
 
   runtimeConfig: {
     databaseUrl:
