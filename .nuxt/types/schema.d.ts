@@ -20,8 +20,6 @@ import { NuxtModule, ModuleDependencyMeta } from '@nuxt/schema'
   interface SharedPublicRuntimeConfig {
    appName: string,
 
-   version: string,
-
    MVP_USER_ID: string,
   }
 declare module '@nuxt/schema' {

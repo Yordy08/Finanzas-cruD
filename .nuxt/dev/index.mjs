@@ -656,7 +656,6 @@ const _inlineRuntimeConfig = {
   },
   "public": {
     "appName": "Finanzas CRUD",
-    "version": "0.0.0",
     "MVP_USER_ID": "6a1b3bfed5ae05d6649ac2fc"
   },
   "databaseUrl": "mongodb+srv://yordisdurango:TuyTNCdwPyyLSJLQ@cluster0.oncirwy.mongodb.net/FinNanzas?retryWrites=true&w=majority&appName=Cluster0"

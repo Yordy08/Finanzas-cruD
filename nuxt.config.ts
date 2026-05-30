@@ -1,5 +1,3 @@
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
 import vuetify from 'vite-plugin-vuetify'
 
 export default defineNuxtConfig({
@@ -20,28 +18,11 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    databaseUrl:
-      process.env.DATABASE_URL ||
-      process.env.DOTENV_DATABASE_URL ||
-      process.env.NUXT_PUBLIC_DATABASE_URL,
+    databaseUrl: process.env.DATABASE_URL,
 
     public: {
       appName: 'Finanzas CRUD',
-      version: (() => {
-        try {
-          const pkg = JSON.parse(
-            readFileSync(join(process.cwd(), 'package.json'), 'utf-8')
-          )
-          return pkg?.version || '0.0.0'
-        } catch {
-          return '0.0.0'
-        }
-      })(),
-
-      MVP_USER_ID:
-        process.env.NUXT_PUBLIC_MVP_USER_ID ||
-        process.env.MVP_USER_ID ||
-        '6a1b3bfed5ae05d6649ac2fc'
+      MVP_USER_ID: process.env.NUXT_PUBLIC_MVP_USER_ID
     }
   },
 
