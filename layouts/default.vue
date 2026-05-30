@@ -16,8 +16,7 @@
 
 <script setup lang="ts">
 import AppNavbar from '~/components/AppNavbar.vue'
-import AppSidebar from '~/components/AppSidebar.vue'
-import AppFooter from '~/components/AppFooter.vue'
+
 </script>
 
 <style scoped>

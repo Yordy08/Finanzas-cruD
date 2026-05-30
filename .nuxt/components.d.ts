@@ -16,8 +16,6 @@ type LazyComponent<T> = DefineComponent<HydrationStrategies, {}, {}, {}, {}, {},
 
 export const AppFooter: typeof import("../components/AppFooter.vue")['default']
 export const AppNavbar: typeof import("../components/AppNavbar.vue")['default']
-export const AppSidebar: typeof import("../components/AppSidebar.vue")['default']
-export const AppSidebarV2: typeof import("../components/AppSidebarV2.vue")['default']
 export const TopBar: typeof import("../components/TopBar.vue")['default']
 export const TransactionForm: typeof import("../components/TransactionForm.vue")['default']
 export const ChartsBalanceLineChart: typeof import("../components/charts/BalanceLineChart.vue")['default']
@@ -61,8 +59,6 @@ export const Body: typeof import("../node_modules/nuxt/dist/head/runtime/compone
 export const NuxtIsland: typeof import("../node_modules/nuxt/dist/app/components/nuxt-island")['default']
 export const LazyAppFooter: LazyComponent<typeof import("../components/AppFooter.vue")['default']>
 export const LazyAppNavbar: LazyComponent<typeof import("../components/AppNavbar.vue")['default']>
-export const LazyAppSidebar: LazyComponent<typeof import("../components/AppSidebar.vue")['default']>
-export const LazyAppSidebarV2: LazyComponent<typeof import("../components/AppSidebarV2.vue")['default']>
 export const LazyTopBar: LazyComponent<typeof import("../components/TopBar.vue")['default']>
 export const LazyTransactionForm: LazyComponent<typeof import("../components/TransactionForm.vue")['default']>
 export const LazyChartsBalanceLineChart: LazyComponent<typeof import("../components/charts/BalanceLineChart.vue")['default']>
