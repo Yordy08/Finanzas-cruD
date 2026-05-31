@@ -21,7 +21,7 @@ export default defineNuxtConfig({
     databaseUrl: process.env.DATABASE_URL,
 
     public: {
-      appName: 'Finanzas CRUD',
+      appName: 'Banco de Finanzas',
       MVP_USER_ID: process.env.NUXT_PUBLIC_MVP_USER_ID
     }
   },

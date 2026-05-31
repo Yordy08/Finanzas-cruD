@@ -1,10 +1,10 @@
 <template>
   <div class="page">
     <header class="header">
-      <div>
-        <h1 class="title">Dashboard</h1>
-        <p class="subtitle">Panel financiero estilo SaaS</p>
-      </div>
+     <div>
+  <h1 class="title">Welcome, Yordy Olivares 👋</h1>
+  <p class="subtitle">Bienvenido de nuevo a tu panel financiero</p>
+</div>
 
       <nav class="nav">
         <NuxtLink class="navLink" to="/movimientos">Movimientos</NuxtLink>
@@ -220,85 +220,108 @@ if (process.client) {
 
 <style scoped>
 .page {
-  padding: 16px;
-  max-width: 1100px;
+  width: 100%;
+  max-width: 1600px;
   margin: 0 auto;
-  color: white;
+  padding: 20px;
+  color: #fff;
 }
+.title {
+  margin: 0;
+  font-size: 36px;
+  font-weight: 900;
+  background: linear-gradient(90deg, #22d3ee, #6366f1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* HEADER */
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 14px;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 .title {
-  font-size: 22px;
   margin: 0;
+  font-size: 32px;
+  font-weight: 800;
 }
 
 .subtitle {
-  margin: 4px 0 0;
+  margin-top: 4px;
   opacity: 0.75;
+  font-size: 14px;
 }
 
 .nav {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .navLink {
-  padding: 8px 10px;
-  border-radius: 10px;
-  background: #0b1220;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #0f172a;
   color: white;
   text-decoration: none;
   font-weight: 600;
+  transition: all .25s ease;
 }
 
 .navLink:hover {
-  filter: brightness(1.1);
+  background: #1e293b;
+  transform: translateY(-2px);
 }
+
+/* CARDS */
 
 .card {
   background: #111827;
   border: 1px solid #1f2937;
   border-radius: 18px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, .25);
-  padding: 14px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  height: 100%;
 }
 
 .cardHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .sectionTitle {
   margin: 0;
   font-size: 16px;
+  font-weight: 700;
 }
 
 .cardLabel {
-  opacity: 0.8;
-  font-weight: 700;
-  font-size: 13px;
-  margin-bottom: 8px;
+  font-size: 14px;
+  opacity: .75;
+  font-weight: 600;
+  margin-bottom: 6px;
 }
 
 .cardValue {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 900;
+  line-height: 1.1;
 }
+
+/* KPI */
 
 .kpiGrid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 14px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 .kpiHint {
@@ -306,9 +329,8 @@ if (process.client) {
 }
 
 .hintLine {
-  opacity: 0.9;
-  font-weight: 700;
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .kpiGreen {
@@ -327,28 +349,34 @@ if (process.client) {
   color: #60a5fa;
 }
 
+/* CHARTS */
+
 .rowCharts {
   display: grid;
-  grid-template-columns: 1.3fr 1fr;
-  gap: 12px;
-  margin-bottom: 14px;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 .chartCol {
   display: grid;
   grid-template-rows: 1fr 1fr;
-  gap: 12px;
+  gap: 16px;
 }
 
 .chartCard {
-  padding: 12px;
+  min-height: 350px;
 }
+
+/* BOTTOM SECTION */
 
 .rowBottom {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 16px;
 }
+
+/* TABLE */
 
 .table {
   display: grid;
@@ -358,24 +386,26 @@ if (process.client) {
 .thead {
   display: grid;
   grid-template-columns: 1fr 1fr 140px 160px;
-  font-weight: 900;
-  opacity: 0.85;
-  padding: 4px 6px;
+  gap: 12px;
+  padding: 6px;
+  font-weight: 800;
+  opacity: .8;
 }
 
 .row {
   display: grid;
   grid-template-columns: 1fr 1fr 140px 160px;
+  gap: 12px;
   align-items: center;
-  padding: 10px;
-  background: rgba(0, 0, 0, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 12px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.05);
   border-radius: 14px;
 }
 
 .cell {
-  font-weight: 800;
-  color: rgba(255, 255, 255, 0.92);
+  font-weight: 600;
+  color: rgba(255,255,255,.92);
 }
 
 .right {
@@ -391,17 +421,30 @@ if (process.client) {
 }
 
 .muted {
-  opacity: 0.75;
+  opacity: .7;
 }
 
-@media (max-width: 980px) {
+/* SCROLL HORIZONTAL SI LA TABLA ES GRANDE */
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+/* TABLET */
+
+@media (max-width: 1200px) {
+
+  .kpiGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .rowCharts {
     grid-template-columns: 1fr;
   }
 
   .chartCol {
-    grid-template-rows: unset;
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
   }
 
   .rowBottom {
@@ -409,37 +452,16 @@ if (process.client) {
   }
 }
 
-@media (max-width: 720px) {
-  .kpiGrid {
-    grid-template-columns: 1fr;
-  }
+/* MOBILE */
 
-  .chartCol {
-    grid-template-columns: 1fr;
-  }
+@media (max-width: 768px) {
 
-  .thead,
-  .row {
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  .thead div:nth-child(3),
-  .thead div:nth-child(4),
-  .row div:nth-child(3),
-  .row div:nth-child(4) {
-    display: none;
-  }
-}
-
-@media (max-width: 600px) {
   .page {
-    padding: 12px;
+    padding: 14px;
   }
 
   .header {
     flex-direction: column;
-    align-items: flex-start;
   }
 
   .nav {
@@ -451,45 +473,53 @@ if (process.client) {
     text-align: center;
   }
 
-  .kpiGrid {
-    grid-template-columns: 1fr;
-    gap: 10px;
+  .title {
+    font-size: 24px;
   }
 
-  .rowCharts {
-    gap: 10px;
+  .kpiGrid {
+    grid-template-columns: 1fr;
   }
 
   .chartCol {
-    gap: 10px;
+    grid-template-columns: 1fr;
   }
 
-  .rowBottom {
-    gap: 10px;
+  .thead {
+    display: none;
   }
 
-  .title {
-    font-size: 20px;
+  .row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 
-  .subtitle {
-    font-size: 13px;
+  .right {
+    text-align: left;
+  }
+
+  .cardValue {
+    font-size: 28px;
+  }
+}
+
+/* CELULARES PEQUEÑOS */
+
+@media (max-width: 480px) {
+
+  .page {
+    padding: 10px;
   }
 
   .card {
     padding: 12px;
-    border-radius: 12px;
-  }
-}
-
-@media (max-width: 480px) {
-  .page {
-    padding: 10px;
-    max-width: none;
+    border-radius: 14px;
   }
 
   .title {
-    font-size: 18px;
+    font-size: 20px;
   }
 
   .subtitle {
@@ -500,19 +530,12 @@ if (process.client) {
     font-size: 24px;
   }
 
-  .card {
-    padding: 10px;
+  .nav {
+    flex-direction: column;
   }
 
-  .thead,
-  .row {
-    gap: 6px;
-  }
-
-  .sectionTitle {
-    font-size: 14px;
+  .navLink {
+    width: 100%;
   }
 }
 </style>
-
-

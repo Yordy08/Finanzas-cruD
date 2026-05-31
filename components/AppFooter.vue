@@ -20,7 +20,7 @@ import { computed, onMounted, ref } from 'vue'
 const appName = computed(() => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const cfg = useNuxtApp().$config as any
-  return cfg?.public?.appName || 'Finanzas CRUD'
+  return cfg?.public?.appName || 'Finanzas'
 })
 
 const version = computed(() => {
