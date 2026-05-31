@@ -90,10 +90,7 @@
         </div>
       </div>
 
-      <div class="card">
-        <h2 class="sectionTitle">Registrar movimiento</h2>
-        <TransactionForm @created="refreshAll" :accounts="accounts" />
-      </div>
+      
     </section>
   </div>
 </template>
