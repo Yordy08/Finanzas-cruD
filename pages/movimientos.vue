@@ -14,23 +14,27 @@
 
       <div v-if="loading" class="muted">Cargando...</div>
 
-      <div v-else class="table">
-        <div class="thead">
-          <div>Fecha</div>
-          <div>Tipo</div>
-          <div>Categoría</div>
-          <div class="right">Monto</div>
-        </div>
+     <div class="tableWrapper">
+  <div class="table">
+    <div class="thead">
+      <div>Fecha</div>
+      <div>Tipo</div>
+      <div>Categoría</div>
+      <div>Descripción</div>
+      <div class="right">Monto</div>
+    </div>
 
-        <div v-for="t in transactions" :key="t.id" class="row">
-          <div class="cell">{{ formatDate(t.date) }}</div>
-          <div class="cell">{{ t.type === 'income' ? 'Ingreso' : 'Gasto' }}</div>
-          <div class="cell">{{ t.category }}</div>
-          <div class="cell right" :class="t.type === 'income' ? 'pos' : 'neg'">
-            {{ formatMoney(t.amount) }}
-          </div>
-        </div>
+    <div v-for="t in transactions" :key="t.id" class="row">
+      <div class="cell">{{ formatDate(t.date) }}</div>
+      <div class="cell">{{ t.type === 'income' ? 'Ingreso' : 'Gasto' }}</div>
+      <div class="cell">{{ t.category }}</div>
+      <div class="cell description">{{ t.description }}</div>
+      <div class="cell right" :class="t.type === 'income' ? 'pos' : 'neg'">
+        {{ formatMoney(t.amount) }}
       </div>
+    </div>
+  </div>
+</div>
     </section>
   </div>
 </template>
@@ -100,6 +104,9 @@ onMounted(refresh)
 </script>
 
 <style scoped>
+
+
+
 .container {
   padding: 16px;
   max-width: 1000px;
@@ -124,9 +131,71 @@ onMounted(refresh)
 .muted {
   opacity: 0.75;
 }
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
 .table {
+  min-width: 900px;
+}
+
+.thead,
+.row {
   display: grid;
-  gap: 10px;
+  grid-template-columns:
+    120px   /* Fecha */
+    110px   /* Tipo */
+    180px   /* Categoría */
+    minmax(250px, 1fr) /* Descripción */
+    150px;  /* Monto */
+
+  gap: 16px;
+  align-items: center;
+}
+
+.thead {
+  padding: 12px;
+  font-weight: 800;
+  color: rgba(255,255,255,.7);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.row {
+  padding: 14px 12px;
+  border-radius: 12px;
+  margin-top: 8px;
+  background: rgba(255,255,255,.03);
+  transition: .2s;
+}
+
+.row:hover {
+  background: rgba(255,255,255,.06);
+}
+
+.cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.description {
+  white-space: normal;
+  word-break: break-word;
+}
+
+.right {
+  text-align: right;
+}
+
+.pos {
+  color: #34d399;
+  font-weight: 700;
+}
+
+.neg {
+  color: #fb7185;
+  font-weight: 700;
 }
 .thead {
   display: grid;
@@ -138,7 +207,7 @@ onMounted(refresh)
   display: grid;
   grid-template-columns: 1fr 120px 1fr 160px;
   align-items: center;
-  padding: 10px;
+  padding: 5px;
   background: rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 14px;
