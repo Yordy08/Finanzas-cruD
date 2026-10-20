@@ -1,11 +1,12 @@
-import { defineEventHandler, getQuery } from 'h3'
+import { defineEventHandler } from 'h3'
 import prisma from '../utils/prisma'
 import { getAccessScope } from '../utils/access'
+import { requireAuthenticatedUser } from '../utils/access'
 
 export default defineEventHandler(async (event) => {
-  const userId = String(getQuery(event).userId || '')
-  const scope = await getAccessScope(userId)
-  const payments = await prisma.payment.findMany({ where: scope.coupleId ? { coupleId: scope.coupleId } : { responsibleUserId: userId }, include: { responsibleUser: { select: { id: true, name: true } } }, orderBy: { dueAt: 'asc' } })
+  const user = await requireAuthenticatedUser(event)
+  const scope = await getAccessScope(user.id)
+  const payments = await prisma.payment.findMany({ where: scope.coupleId ? { OR: [{ coupleId: scope.coupleId, scope: 'shared' }, { responsibleUserId: user.id, scope: 'individual' }] } : { responsibleUserId: user.id }, include: { responsibleUser: { select: { id: true, name: true } } }, orderBy: { dueAt: 'asc' } })
   const now = Date.now()
   return payments.map((payment) => {
     const diff = new Date(payment.dueAt).getTime() - now

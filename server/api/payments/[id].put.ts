@@ -2,6 +2,7 @@ import { createError, defineEventHandler, getRouterParam, readBody } from 'h3'
 import { z } from 'zod'
 import prisma from '../../utils/prisma'
 import { getAccessScope, parseDate } from '../../utils/access'
+import { requireAuthenticatedUser } from '../../utils/access'
 
 const Schema = z.object({ userId: z.string(), status: z.enum(['pending', 'paid', 'cancelled']), paidAt: z.string().optional() })
 
@@ -9,8 +10,9 @@ export default defineEventHandler(async (event) => {
   const parsed = Schema.safeParse(await readBody(event))
   const id = getRouterParam(event, 'id')
   if (!parsed.success || !id) throw createError({ statusCode: 400, statusMessage: 'Invalid payment update' })
-  const scope = await getAccessScope(parsed.data.userId)
-  const payment = await prisma.payment.findFirst({ where: { id, OR: [{ responsibleUserId: parsed.data.userId }, ...(scope.coupleId ? [{ coupleId: scope.coupleId }] : [])] } })
+   const user = await requireAuthenticatedUser(event)
+   const scope = await getAccessScope(user.id)
+   const payment = await prisma.payment.findFirst({ where: { id, OR: [{ responsibleUserId: user.id }, ...(scope.coupleId ? [{ coupleId: scope.coupleId }] : [])] } })
   if (!payment) throw createError({ statusCode: 404, statusMessage: 'Payment not found' })
   const paidAt = parsed.data.status === 'paid' ? (parsed.data.paidAt ? parseDate(parsed.data.paidAt, 'paidAt') : new Date()) : null
   return prisma.$transaction(async (tx) => {

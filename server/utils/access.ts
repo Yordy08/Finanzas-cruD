@@ -1,5 +1,9 @@
 import { createError } from 'h3'
 import prisma from './prisma'
+import { requireAuth } from './auth'
+import type { H3Event } from 'h3'
+
+export const requireAuthenticatedUser = (event: H3Event) => requireAuth(event)
 
 export const requireUser = async (userId: unknown) => {
   if (typeof userId !== 'string' || !/^[a-f\d]{24}$/i.test(userId)) {

@@ -1,7 +1,8 @@
 import prisma from '../utils/prisma'
 import { z } from 'zod'
 import { createError, defineEventHandler, readBody } from 'h3'
-import { requireUser, parseDate } from '../utils/access'
+import { parseDate, getAccessScope } from '../utils/access'
+import { requireAuthenticatedUser } from '../utils/access'
 
 
 const BodySchema = z.object({
@@ -23,14 +24,16 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid body', data: parsed.error.flatten() })
   }
 
-  const { userId, accountId, amount, category, description } = parsed.data
-  await requireUser(userId)
+  const { accountId, amount, category, description } = parsed.data
+  const user = await requireAuthenticatedUser(event)
+  const userId = user.id
   const typeInput = parsed.data.type
   const type = typeInput === 'ingreso' ? 'income' : typeInput === 'gasto' ? 'expense' : typeInput
   const date = parsed.data.date ? parseDate(parsed.data.date) : new Date()
 
     return await (prisma as any).$transaction(async (tx) => {
-    const account = await tx.account.findFirst({ where: { id: accountId, userId } } as any)
+    const access = await getAccessScope(userId)
+    const account = await tx.account.findFirst({ where: { id: accountId, OR: [{ userId }, ...(access.coupleId ? [{ coupleId: access.coupleId }] : [])] } } as any)
     if (!account) {
       throw createError({ statusCode: 404, statusMessage: 'Account not found for user' })
     }

@@ -1,13 +1,13 @@
-import { createError, defineEventHandler, getQuery } from 'h3'
+import { defineEventHandler } from 'h3'
 import prisma from '../utils/prisma'
 import { getAccessScope } from '../utils/access'
+import { requireAuthenticatedUser } from '../utils/access'
 
 export default defineEventHandler(async (event) => {
-  const query = getQuery(event)
-  const userId = String(query.userId || '')
-  const scope = await getAccessScope(userId)
+  const user = await requireAuthenticatedUser(event)
+  const scope = await getAccessScope(user.id)
   const goals = await prisma.goal.findMany({
-    where: scope.coupleId ? { coupleId: scope.coupleId } : { ownerUserId: userId },
+    where: scope.coupleId ? { OR: [{ coupleId: scope.coupleId, scope: 'shared' }, { ownerUserId: user.id, scope: 'individual' }] } : { ownerUserId: user.id },
     include: { movements: { orderBy: { date: 'desc' }, include: { user: { select: { id: true, name: true } } } } },
     orderBy: { createdAt: 'desc' },
   })

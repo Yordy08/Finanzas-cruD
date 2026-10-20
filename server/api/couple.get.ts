@@ -1,10 +1,11 @@
-import { defineEventHandler, getQuery } from 'h3'
+import { defineEventHandler } from 'h3'
 import prisma from '../utils/prisma'
 import { getAccessScope } from '../utils/access'
+import { requireAuthenticatedUser } from '../utils/access'
 
 export default defineEventHandler(async (event) => {
-  const userId = String(getQuery(event).userId || '')
-  const scope = await getAccessScope(userId)
+  const user = await requireAuthenticatedUser(event)
+  const scope = await getAccessScope(user.id)
   if (!scope.coupleId) return { couple: null, members: [] }
 
   return prisma.couple.findUnique({

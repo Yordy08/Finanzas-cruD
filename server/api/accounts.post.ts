@@ -1,7 +1,8 @@
 import prisma from '../utils/prisma'
 import { z } from 'zod'
 import { createError, defineEventHandler, readBody } from 'h3'
-import { getAccessScope, requireUser } from '../utils/access'
+import { getAccessScope } from '../utils/access'
+import { requireAuthenticatedUser } from '../utils/access'
 
 
 
@@ -20,7 +21,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid body', data: parsed.error.flatten() })
   }
 
-  const { userId, name } = parsed.data
+  const { name } = parsed.data
+  const user = await requireAuthenticatedUser(event)
+  const userId = user.id
   const balance = parsed.data.balance ?? 0
 
   const scope = await getAccessScope(userId)
