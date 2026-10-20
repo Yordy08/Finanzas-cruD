@@ -1,14 +1,15 @@
 import prisma from '../utils/prisma'
 import { z } from 'zod'
 import { createError, defineEventHandler, readBody } from 'h3'
+import { getAccessScope, requireUser } from '../utils/access'
 
 
 
 
 const BodySchema = z.object({
   userId: z.string().min(1),
-  name: z.string().min(1),
-  balance: z.number().optional(),
+  name: z.string().trim().min(1).max(100),
+  balance: z.number().finite().nonnegative().optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -22,16 +23,14 @@ export default defineEventHandler(async (event) => {
   const { userId, name } = parsed.data
   const balance = parsed.data.balance ?? 0
 
-  const user = await prisma.user.findUnique({ where: { id: userId } })
-  if (!user) {
-    throw createError({ statusCode: 404, statusMessage: 'User not found' })
-  }
+  const scope = await getAccessScope(userId)
 
   return await prisma.account.create({
     data: {
       name,
       balance,
       userId,
+      coupleId: scope.coupleId,
     },
   })
 })

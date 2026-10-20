@@ -1,6 +1,7 @@
 import prisma from '../utils/prisma'
 import { z } from 'zod'
 import { createError, defineEventHandler, getQuery } from 'h3'
+import { getAccessScope } from '../utils/access'
 
 
 
@@ -18,9 +19,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const { userId } = parsed.data
+  const scope = await getAccessScope(userId)
 
   return await prisma.account.findMany({
-    where: { userId },
+    where: scope.coupleId ? { OR: [{ userId: { in: scope.memberIds } }, { coupleId: scope.coupleId }] } : { userId },
     orderBy: { createdAt: 'desc' },
   })
 })

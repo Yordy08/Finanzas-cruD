@@ -1,0 +1,13 @@
+<template>
+  <div class="container"><TopBar /><h1>Mi pareja</h1><section v-if="!couple" class="card"><h2>Crear espacio compartido</h2><p>Vincula a dos integrantes para compartir metas, cuentas y pagos.</p><form @submit.prevent="create"><input v-model="name" required placeholder="Nombre del espacio" /><button>Crear pareja</button></form></section><template v-else><section class="card"><h2>{{ couple.name }}</h2><div v-for="member in couple.members" :key="member.id" class="member"><span>{{ member.displayName || member.user.name || member.user.email }}</span><small>{{ member.role }}</small></div></section><section class="card"><h2>Invitar integrante</h2><form @submit.prevent="invite"><input v-model="email" type="email" placeholder="Correo (opcional)" /><button>Generar invitación</button></form><p v-if="inviteToken" class="token">Comparte este código de invitación: <strong>{{ inviteToken }}</strong></p></section></template><p v-if="error" class="error">{{ error }}</p></div>
+</template>
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'; import TopBar from '~/components/TopBar.vue'; import { useMvpUserId } from '~/composables/useMvpUserId'
+const userId = useMvpUserId(); const couple = ref<any>(null); const name = ref('Nuestro hogar'); const email = ref(''); const inviteToken = ref(''); const error = ref('')
+const refresh = async () => { if (userId) { const result: any = await $fetch('/api/couple', { params: { userId } }); couple.value = result?.id ? result : null } }
+const create = async () => { try { await $fetch('/api/couple', { method: 'POST', body: { userId, name: name.value } }); await refresh() } catch (e: any) { error.value = e?.data?.statusMessage || 'No se pudo crear el espacio' } }
+const invite = async () => { try { const result: any = await $fetch('/api/couple-invite', { method: 'POST', body: { userId, email: email.value || undefined } }); inviteToken.value = result.token } catch (e: any) { error.value = e?.data?.statusMessage || 'No se pudo generar la invitación' } }
+onMounted(refresh)
+</script>
+<style scoped>.container{max-width:900px;margin:auto;color:#fff}.card{background:#111827;border:1px solid #263244;border-radius:18px;padding:18px;margin:14px 0}.card form{display:flex;gap:10px}.card input{flex:1;padding:11px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:#fff}.card button{padding:11px 14px;border:0;border-radius:10px;background:#2563eb;color:#fff;font-weight:800}.member{display:flex;justify-content:space-between;border-bottom:1px solid #263244;padding:12px 0}.member small{opacity:.7}.token{margin-top:14px;padding:12px;background:#0f172a;overflow-wrap:anywhere}.error{color:#fb7185}@media(max-width:600px){.card form{flex-direction:column}}
+</style>

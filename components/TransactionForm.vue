@@ -26,6 +26,11 @@
       </label>
 
       <label class="label">
+        Fecha
+        <input v-model="form.date" class="input" type="date" required />
+      </label>
+
+      <label class="label">
         Monto
         <input v-model.number="form.amount" type="number" min="0" step="0.01" class="input" />
       </label>
@@ -47,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useMvpUserId } from '~/composables/useMvpUserId'
 
 const props = defineProps<{
@@ -66,6 +71,7 @@ const form = reactive({
   category: '',
   amount: 0,
   description: '' as string | undefined,
+  date: new Date().toISOString().slice(0, 10),
 })
 
 const loading = ref(false)
@@ -82,6 +88,10 @@ const formatMoney = (n: number) => {
 if (accountsSafe.value.length > 0 && !form.accountId) {
   form.accountId = accountsSafe.value[0].id
 }
+
+watch(accountsSafe, (accounts) => {
+  if (accounts.length > 0 && !accounts.some((account) => account.id === form.accountId)) form.accountId = accounts[0].id
+})
 
 
 const onSubmit = async () => {
@@ -109,6 +119,7 @@ const onSubmit = async () => {
         amount: form.amount,
         category: form.category,
         description: form.description || undefined,
+        date: new Date(`${form.date}T12:00:00`).toISOString(),
       },
     })
 
@@ -118,6 +129,7 @@ const onSubmit = async () => {
     form.category = ''
     form.amount = 0
     form.description = undefined
+    form.date = new Date().toISOString().slice(0, 10)
   } catch (e: any) {
     error.value = e?.data?.statusMessage || e?.message || 'Error al guardar'
   } finally {

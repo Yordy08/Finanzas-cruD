@@ -74,15 +74,11 @@ export default defineNuxtConfig({
 
       runtimeCaching: [
         {
-          urlPattern: /^https:\/\/(.*)\/api\//,
-          handler: 'NetworkFirst',
+          // Los datos financieros son privados y no deben quedar en caché offline.
+          urlPattern: /\/api\//,
+          handler: 'NetworkOnly',
           options: {
-            cacheName: 'pwa-api',
-            networkTimeoutSeconds: 5,
-            expiration: {
-              maxEntries: 50,
-              maxAgeSeconds: 60 * 60
-            }
+            cacheName: 'pwa-private-api'
           }
         },
         {

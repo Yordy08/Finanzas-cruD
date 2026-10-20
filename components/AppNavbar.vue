@@ -2,7 +2,7 @@
   <header class="navbar">
     <div class="left">
       <NuxtLink class="brand" to="/">
-        <img class="brandIcon" src="/public/logo.png" alt="Logo" />
+        <img class="brandIcon" src="/logo.png" alt="Logo" />
         <span class="brandText">{{ appName }}</span>
       </NuxtLink>
     </div>

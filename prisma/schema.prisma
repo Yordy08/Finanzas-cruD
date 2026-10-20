@@ -15,6 +15,11 @@ model User {
 
   accounts     Account[]
   transactions Transaction[]
+  recordedTransactions Transaction[] @relation("TransactionRecorder")
+  coupleMemberships CoupleMember[]
+  createdGoals Goal[] @relation("GoalCreator")
+  goalMovements GoalMovement[]
+  responsiblePayments Payment[] @relation("PaymentResponsible")
 }
 
 model Account {
@@ -28,6 +33,8 @@ model Account {
   createdAt DateTime @default(now())
 
   transactions Transaction[]
+  coupleId String? @db.ObjectId
+  couple Couple? @relation(fields: [coupleId], references: [id])
 }
 
 model Transaction {
@@ -47,5 +54,111 @@ model Transaction {
   accountId   String?  @db.ObjectId
   account     Account? @relation(fields: [accountId], references: [id])
 
+  recordedById String? @db.ObjectId
+  recordedBy User? @relation("TransactionRecorder", fields: [recordedById], references: [id])
+  scope String @default("individual")
+  goalId String? @db.ObjectId
+  goal Goal? @relation(fields: [goalId], references: [id])
+  paymentId String? @db.ObjectId
+  payment Payment? @relation(fields: [paymentId], references: [id])
+
   createdAt   DateTime @default(now())
+
+  @@index([userId, date])
+  @@index([userId, type])
+  @@index([accountId, date])
+}
+
+model Couple {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  createdAt DateTime @default(now())
+  members CoupleMember[]
+  invites CoupleInvite[]
+  accounts Account[]
+  goals Goal[]
+  payments Payment[]
+}
+
+model CoupleMember {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  coupleId String @db.ObjectId
+  couple Couple @relation(fields: [coupleId], references: [id])
+  userId String @db.ObjectId
+  user User @relation(fields: [userId], references: [id])
+  role String @default("member")
+  displayName String?
+  joinedAt DateTime @default(now())
+  @@unique([coupleId, userId])
+  @@index([userId])
+}
+
+model CoupleInvite {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  coupleId String @db.ObjectId
+  couple Couple @relation(fields: [coupleId], references: [id])
+  email String?
+  token String @unique
+  invitedById String @db.ObjectId
+  status String @default("pending")
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Goal {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  description String?
+  target Float
+  startDate DateTime @default(now())
+  dueDate DateTime?
+  status String @default("active")
+  scope String @default("shared")
+  ownerUserId String @db.ObjectId
+  owner User @relation("GoalCreator", fields: [ownerUserId], references: [id])
+  coupleId String? @db.ObjectId
+  couple Couple? @relation(fields: [coupleId], references: [id])
+  movements GoalMovement[]
+  transactions Transaction[]
+  createdAt DateTime @default(now())
+  @@index([ownerUserId, status])
+  @@index([coupleId, status])
+}
+
+model GoalMovement {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  goalId String @db.ObjectId
+  goal Goal @relation(fields: [goalId], references: [id])
+  type String
+  amount Float
+  date DateTime @default(now())
+  description String?
+  userId String @db.ObjectId
+  user User @relation(fields: [userId], references: [id])
+  transactionId String? @db.ObjectId
+  createdAt DateTime @default(now())
+  @@index([goalId, date])
+}
+
+model Payment {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+  description String?
+  amount Float?
+  dueAt DateTime
+  category String
+  responsibleUserId String? @db.ObjectId
+  responsibleUser User? @relation("PaymentResponsible", fields: [responsibleUserId], references: [id])
+  scope String @default("shared")
+  recurrence String @default("once")
+  status String @default("pending")
+  reminderHours Int @default(168)
+  paidAt DateTime?
+  transactionId String? @db.ObjectId
+  coupleId String? @db.ObjectId
+  couple Couple? @relation(fields: [coupleId], references: [id])
+  transactions Transaction[]
+  createdAt DateTime @default(now())
+  @@index([coupleId, dueAt, status])
+  @@index([responsibleUserId, dueAt])
 }

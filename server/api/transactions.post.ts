@@ -1,16 +1,18 @@
 import prisma from '../utils/prisma'
 import { z } from 'zod'
 import { createError, defineEventHandler, readBody } from 'h3'
+import { requireUser, parseDate } from '../utils/access'
 
 
 const BodySchema = z.object({
   userId: z.string().min(1),
   accountId: z.string().min(1),
   type: z.union([z.enum(['income', 'expense']), z.enum(['ingreso', 'gasto'])]),
-  amount: z.number().positive(),
-  category: z.string().min(1),
-  description: z.string().optional(),
-  date: z.string().optional(), // ISO
+  amount: z.number().finite().positive(),
+  category: z.string().trim().min(1).max(80),
+  description: z.string().max(500).optional(),
+  date: z.string().optional(),
+  scope: z.enum(['individual', 'shared']).default('individual'),
 })
 
 export default defineEventHandler(async (event) => {
@@ -22,9 +24,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const { userId, accountId, amount, category, description } = parsed.data
+  await requireUser(userId)
   const typeInput = parsed.data.type
   const type = typeInput === 'ingreso' ? 'income' : typeInput === 'gasto' ? 'expense' : typeInput
-  const date = parsed.data.date ? new Date(parsed.data.date) : new Date()
+  const date = parsed.data.date ? parseDate(parsed.data.date) : new Date()
 
     return await (prisma as any).$transaction(async (tx) => {
     const account = await tx.account.findFirst({ where: { id: accountId, userId } } as any)
@@ -42,13 +45,15 @@ export default defineEventHandler(async (event) => {
         description,
         date,
         userId,
+        recordedById: userId,
         accountId,
+        scope: parsed.data.scope,
       },
     })
 
     await tx.account.update({
       where: { id: accountId },
-      data: { balance: account.balance + signedAmount },
+      data: { balance: { increment: signedAmount } },
     })
 
     return transaction

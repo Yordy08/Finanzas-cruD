@@ -1,0 +1,18 @@
+import { createError, defineEventHandler, readBody } from 'h3'
+import { z } from 'zod'
+import { randomUUID } from 'node:crypto'
+import prisma from '../utils/prisma'
+import { getAccessScope } from '../utils/access'
+
+const Schema = z.object({ userId: z.string(), email: z.string().email().optional() })
+
+export default defineEventHandler(async (event) => {
+  const parsed = Schema.safeParse(await readBody(event))
+  if (!parsed.success) throw createError({ statusCode: 400, statusMessage: 'Invalid invitation' })
+  const scope = await getAccessScope(parsed.data.userId)
+  if (!scope.coupleId) throw createError({ statusCode: 409, statusMessage: 'Create a couple first' })
+
+  return prisma.coupleInvite.create({
+    data: { coupleId: scope.coupleId, invitedById: parsed.data.userId, email: parsed.data.email, token: randomUUID(), expiresAt: new Date(Date.now() + 7 * 86400000) },
+  })
+})

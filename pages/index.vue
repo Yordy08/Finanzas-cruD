@@ -2,13 +2,15 @@
   <div class="page">
     <header class="header">
      <div>
-  <h1 class="title">Welcome, Yordy Olivares 👋</h1>
-  <p class="subtitle">Bienvenido de nuevo a tu panel financiero</p>
+   <h1 class="title">Finanzas de {{ memberNames || 'la pareja' }}</h1>
+   <p class="subtitle">Resumen conjunto de ingresos, gastos, metas y pagos</p>
 </div>
 
       <nav class="nav">
         <NuxtLink class="navLink" to="/movimientos">Movimientos</NuxtLink>
         <NuxtLink class="navLink" to="/cuentas">Cuentas</NuxtLink>
+        <NuxtLink class="navLink" to="/metas">Metas</NuxtLink>
+        <NuxtLink class="navLink" to="/pagos">Pagos</NuxtLink>
       </nav>
     </header>
 
@@ -103,7 +105,6 @@ import BalanceLineChart from '~/components/charts/BalanceLineChart.vue'
 import IncomeExpenseChart from '~/components/charts/IncomeExpenseChart.vue'
 import CategoryDonutChart from '~/components/charts/CategoryDonutChart.vue'
 
-import TransactionForm from '~/components/TransactionForm.vue'
 
 type Account = {
   id: string
@@ -126,6 +127,7 @@ const userIdResolved = computed(() => userIdSafe.value)
 const accounts = ref<Account[]>([])
 const transactions = ref<Transaction[]>([])
 const loading = ref(false)
+const memberNames = ref('')
 
 const formatMoney = (n: number) => {
   try {
@@ -204,6 +206,9 @@ const refreshAll = async () => {
       $fetch(`/api/accounts`, { params: { userId: userIdResolved.value } }),
       $fetch(`/api/transactions`, { params: { userId: userIdResolved.value } }),
     ])
+
+    const couple: any = await $fetch('/api/couple', { params: { userId: userIdResolved.value } })
+    memberNames.value = couple?.members?.map((member: any) => member.displayName || member.user?.name || member.user?.email).join(' y ') || ''
 
     accounts.value = accRes as Account[]
     transactions.value = txRes as any as Transaction[]

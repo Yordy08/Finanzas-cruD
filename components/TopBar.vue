@@ -3,7 +3,12 @@
     <NuxtLink class="brand" to="/">Finanzas</NuxtLink>
     <div class="links">
       <NuxtLink class="link" to="/movimientos">Movimientos</NuxtLink>
+      <NuxtLink class="link" to="/buscar">Buscar</NuxtLink>
       <NuxtLink class="link" to="/cuentas">Cuentas</NuxtLink>
+      <NuxtLink class="link" to="/metas">Metas</NuxtLink>
+      <NuxtLink class="link" to="/pagos">Pagos</NuxtLink>
+      <NuxtLink class="link" to="/pareja">Pareja</NuxtLink>
+      <NuxtLink class="link" to="/notificaciones">Avisos</NuxtLink>
     </div>
   </header>
 </template>
@@ -26,6 +31,7 @@
 .links {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 .link {
   color: white;

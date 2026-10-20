@@ -20,15 +20,17 @@
       <div>Fecha</div>
       <div>Tipo</div>
       <div>Categoría</div>
-      <div>Descripción</div>
-      <div class="right">Monto</div>
+       <div>Descripción</div>
+       <div>Integrante</div>
+       <div class="right">Monto</div>
     </div>
 
     <div v-for="t in transactions" :key="t.id" class="row">
       <div class="cell">{{ formatDate(t.date) }}</div>
       <div class="cell">{{ t.type === 'income' ? 'Ingreso' : 'Gasto' }}</div>
       <div class="cell">{{ t.category }}</div>
-      <div class="cell description">{{ t.description }}</div>
+       <div class="cell description">{{ t.description }}</div>
+       <div class="cell">{{ t.recordedBy?.name || t.recordedBy?.email || 'Sin asignar' }}</div>
       <div class="cell right" :class="t.type === 'income' ? 'pos' : 'neg'">
         {{ formatMoney(t.amount) }}
       </div>
@@ -199,15 +201,15 @@ onMounted(refresh)
 }
 .thead {
   display: grid;
-  grid-template-columns: 1fr 120px 1fr 160px;
+  grid-template-columns: 120px 110px 180px minmax(180px, 1fr) 150px;
   font-weight: 900;
   opacity: 0.8;
 }
 .row {
   display: grid;
-  grid-template-columns: 1fr 120px 1fr 160px;
+  grid-template-columns: 120px 110px 180px minmax(180px, 1fr) 150px;
   align-items: center;
-  padding: 5px;
+  padding: 14px 12px;
   background: rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 14px;
