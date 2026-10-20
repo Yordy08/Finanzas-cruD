@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   const user = await requireAuthenticatedUser(event)
   const scope = await getAccessScope(user.id)
   const goals = await prisma.goal.findMany({
-    where: scope.coupleId ? { OR: [{ coupleId: scope.coupleId, scope: 'shared' }, { ownerUserId: user.id, scope: 'individual' }] } : { ownerUserId: user.id },
+    where: scope.coupleId ? { OR: [{ coupleId: scope.coupleId }, { ownerUserId: { in: scope.memberIds } }] } : { ownerUserId: user.id },
     include: { movements: { orderBy: { date: 'desc' }, include: { user: { select: { id: true, name: true } } } } },
     orderBy: { createdAt: 'desc' },
   })

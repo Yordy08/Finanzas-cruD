@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
 
   return await prisma.transaction.findMany({
     where: {
-      OR: [{ userId: scope.userId, scope: 'individual' }, { scope: 'shared', userId: { in: scope.memberIds } }],
+      userId: { in: scope.memberIds },
       ...(accountId ? { accountId } : {}),
       ...(type ? { type } : {}),
       ...(category ? { category } : {}),

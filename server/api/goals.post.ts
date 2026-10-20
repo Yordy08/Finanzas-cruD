@@ -19,9 +19,9 @@ export default defineEventHandler(async (event) => {
       target: parsed.data.target,
       startDate: parsed.data.startDate ? parseDate(parsed.data.startDate, 'startDate') : new Date(),
       dueDate: parsed.data.dueDate ? parseDate(parsed.data.dueDate, 'dueDate') : undefined,
-      scope: parsed.data.scope,
+       scope: scope.coupleId ? 'shared' : 'individual',
        ownerUserId: user.id,
-      coupleId: parsed.data.scope === 'shared' ? scope.coupleId : undefined,
+       coupleId: scope.coupleId ?? undefined,
     },
   })
 })

@@ -33,12 +33,9 @@ export default defineEventHandler(async (event) => {
 
     return await (prisma as any).$transaction(async (tx) => {
     const access = await getAccessScope(userId)
-    const account = await tx.account.findFirst({ where: { id: accountId, OR: [{ userId }, ...(access.coupleId ? [{ coupleId: access.coupleId }] : [])] } } as any)
+    const account = await tx.account.findFirst({ where: { id: accountId, OR: [{ userId }, ...(access.coupleId ? [{ userId: { in: access.memberIds } }, { coupleId: access.coupleId }] : [])] } } as any)
     if (!account) {
       throw createError({ statusCode: 404, statusMessage: 'Account not found for user' })
-    }
-    if (parsed.data.scope === 'shared' && (!access.coupleId || account.coupleId !== access.coupleId)) {
-      throw createError({ statusCode: 409, statusMessage: 'A shared transaction requires a shared account and couple' })
     }
 
     const signedAmount = type === 'income' ? amount : -amount
@@ -53,7 +50,7 @@ export default defineEventHandler(async (event) => {
         userId,
         recordedById: userId,
         accountId,
-        scope: parsed.data.scope,
+        scope: access.coupleId ? 'shared' : 'individual',
       },
     })
 
