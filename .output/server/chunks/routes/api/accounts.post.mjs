@@ -1,6 +1,6 @@
-import { p as prisma } from '../../_/prisma.mjs';
+import { g as getAccessScope, a as prisma } from '../../_/access.mjs';
 import { z } from 'zod';
-import { b as defineEventHandler, u as readBody, c as createError } from '../../_/nitro.mjs';
+import { b as defineEventHandler, v as readBody, c as createError } from '../../_/nitro.mjs';
 import '@prisma/client';
 import 'node:http';
 import 'node:https';
@@ -13,8 +13,8 @@ import 'node:url';
 
 const BodySchema = z.object({
   userId: z.string().min(1),
-  name: z.string().min(1),
-  balance: z.number().optional()
+  name: z.string().trim().min(1).max(100),
+  balance: z.number().finite().nonnegative().optional()
 });
 const accounts_post = defineEventHandler(async (event) => {
   var _a;
@@ -25,15 +25,13 @@ const accounts_post = defineEventHandler(async (event) => {
   }
   const { userId, name } = parsed.data;
   const balance = (_a = parsed.data.balance) != null ? _a : 0;
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) {
-    throw createError({ statusCode: 404, statusMessage: "User not found" });
-  }
+  const scope = await getAccessScope(userId);
   return await prisma.account.create({
     data: {
       name,
       balance,
-      userId
+      userId,
+      coupleId: scope.coupleId
     }
   });
 });

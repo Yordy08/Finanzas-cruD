@@ -1,6 +1,6 @@
 import { defineComponent, shallowRef, h, resolveComponent, computed, unref } from 'vue';
-import { s as parseQuery, o as hasProtocol, r as joinURL, C as withTrailingSlash, D as withoutTrailingSlash } from '../_/nitro.mjs';
-import { b as useRouter, e as encodeRoutePath, r as resolveRouteObject, n as navigateTo, u as useNuxtApp, c as useRuntimeConfig, a as nuxtLinkDefaults } from './server.mjs';
+import { t as parseQuery, p as hasProtocol, s as joinURL, D as withTrailingSlash, E as withoutTrailingSlash } from '../_/nitro.mjs';
+import { b as useRouter$1, e as encodeRoutePath, r as resolveRouteObject, n as navigateTo, u as useNuxtApp, c as useRuntimeConfig, a as nuxtLinkDefaults } from './server.mjs';
 
 const firstNonUndefined = (...args) => args.find((arg) => arg !== void 0);
 // @__NO_SIDE_EFFECTS__
@@ -28,7 +28,7 @@ function defineNuxtLink(options) {
   }
   function useNuxtLink(props) {
     var _a, _b, _c;
-    const router = useRouter();
+    const router = useRouter$1();
     const config = useRuntimeConfig();
     const hasTarget = computed(() => !!unref(props.target) && unref(props.target) !== "_self");
     const isAbsoluteUrl = computed(() => {
@@ -180,7 +180,7 @@ function defineNuxtLink(options) {
     },
     useLink: useNuxtLink,
     setup(props, { slots }) {
-      const router = useRouter();
+      const router = useRouter$1();
       const { to, href, navigate, isExternal, hasTarget, isAbsoluteUrl } = useNuxtLink(props);
       shallowRef(false);
       const el = void 0;

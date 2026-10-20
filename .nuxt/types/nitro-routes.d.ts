@@ -7,6 +7,30 @@ declare module "nitropack/types" {
       'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/accounts.get').default>>>>
       'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/accounts.post').default>>>>
     }
+    '/api/couple-accept': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/couple-accept.post').default>>>>
+    }
+    '/api/couple-invite': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/couple-invite.post').default>>>>
+    }
+    '/api/couple': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/couple.get').default>>>>
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/couple.post').default>>>>
+    }
+    '/api/goal-movements': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/goal-movements.post').default>>>>
+    }
+    '/api/goals': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/goals.get').default>>>>
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/goals.post').default>>>>
+    }
+    '/api/payments': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/payments.get').default>>>>
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/payments.post').default>>>>
+    }
+    '/api/payments/:id': {
+      'put': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/payments/[id].put').default>>>>
+    }
     '/api/ping': {
       'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/ping.get').default>>>>
     }

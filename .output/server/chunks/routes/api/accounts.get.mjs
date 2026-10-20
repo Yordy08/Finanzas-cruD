@@ -1,4 +1,4 @@
-import { p as prisma } from '../../_/prisma.mjs';
+import { g as getAccessScope, a as prisma } from '../../_/access.mjs';
 import { z } from 'zod';
 import { b as defineEventHandler, k as getQuery, c as createError } from '../../_/nitro.mjs';
 import '@prisma/client';
@@ -21,8 +21,9 @@ const accounts_get = defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Invalid query", data: parsed.error.flatten() });
   }
   const { userId } = parsed.data;
+  const scope = await getAccessScope(userId);
   return await prisma.account.findMany({
-    where: { userId },
+    where: scope.coupleId ? { OR: [{ userId: { in: scope.memberIds } }, { coupleId: scope.coupleId }] } : { userId },
     orderBy: { createdAt: "desc" }
   });
 });
