@@ -31,9 +31,10 @@
       <div class="cell">{{ t.category }}</div>
        <div class="cell description">{{ t.description }}</div>
        <div class="cell">{{ t.recordedBy?.name || t.recordedBy?.email || 'Sin asignar' }}</div>
-      <div class="cell right" :class="t.type === 'income' ? 'pos' : 'neg'">
-        {{ formatMoney(t.amount) }}
-      </div>
+       <div class="cell right" :class="t.type === 'income' ? 'pos' : 'neg'">
+         {{ formatMoney(t.amount) }}
+       </div>
+       <div class="cell actions"><button class="action" @click="editTransaction(t)">Editar</button><button class="action danger" @click="deleteTransaction(t.id)">Eliminar</button></div>
     </div>
   </div>
 </div>
@@ -99,6 +100,22 @@ const refresh = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const editTransaction = async (transaction: any) => {
+  const category = window.prompt('Categoría', transaction.category)
+  if (!category) return
+  const amountInput = window.prompt('Monto', String(transaction.amount))
+  const amount = Number(amountInput)
+  if (!Number.isFinite(amount) || amount <= 0) return
+  await $fetch(`/api/transactions/${transaction.id}`, { method: 'PUT', body: { category, amount, description: transaction.description || null } })
+  await refresh()
+}
+
+const deleteTransaction = async (id: string) => {
+  if (!window.confirm('¿Eliminar este movimiento? El saldo se corregirá automáticamente.')) return
+  await $fetch(`/api/transactions/${id}`, { method: 'DELETE' })
+  await refresh()
 }
 
 
@@ -199,6 +216,9 @@ onMounted(refresh)
   color: #fb7185;
   font-weight: 700;
 }
+.actions { display:flex; gap:6px; white-space:normal; }
+.action { border:0; border-radius:8px; padding:6px 8px; background:#334155; color:#fff; font-weight:700; cursor:pointer; }
+.danger { background:#7f1d1d; }
 .thead {
   display: grid;
   grid-template-columns: 120px 110px 180px minmax(180px, 1fr) 150px;

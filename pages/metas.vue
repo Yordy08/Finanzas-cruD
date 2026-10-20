@@ -9,7 +9,7 @@
     </form><p v-if="error" class="error">{{ error }}</p></section>
     <section v-for="goal in goals" :key="goal.id" class="card goal">
       <div class="goalHead"><div><h2>{{ goal.name }}</h2><p>{{ goal.description || 'Meta compartida' }}</p></div><strong>{{ money(goal.balance) }}</strong></div>
-      <div class="bar"><span :style="{ width: `${goal.progress}%` }" /></div><div class="stats"><span>{{ goal.progress.toFixed(2) }}%</span><span>Aportado {{ money(goal.contributions) }}</span><span>Retirado {{ money(goal.withdrawals) }}</span><span>Objetivo {{ money(goal.target) }}</span></div>
+       <div class="bar"><span :style="{ width: `${goal.progress}%` }" /></div><div class="stats"><span>{{ goal.progress.toFixed(2) }}% completado</span><span>Aportado {{ money(goal.balance) }}</span><span>Falta {{ money(goal.remaining) }}</span><span>Objetivo {{ money(goal.target) }}</span><span>Retirado {{ money(goal.withdrawals) }}</span></div>
       <form class="movement" @submit.prevent="addMovement(goal.id)"><select v-model="movement.type"><option value="contribution">Aporte</option><option value="withdrawal">Retiro</option></select><input v-model.number="movement.amount" min="0.01" step="0.01" type="number" placeholder="Valor COP" required /><input v-model="movement.description" placeholder="Descripción" /><button>Registrar</button></form>
       <details><summary>Historial ({{ goal.movements.length }})</summary><p v-for="item in goal.movements" :key="item.id" class="history"><span>{{ item.type === 'contribution' ? 'Aporte' : 'Retiro' }} · {{ item.user?.name || 'Integrante' }}</span><strong :class="item.type">{{ money(item.amount) }}</strong></p></details>
     </section><p v-if="!goals.length" class="empty">Todavía no hay metas.</p>

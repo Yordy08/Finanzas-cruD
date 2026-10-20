@@ -15,6 +15,6 @@ export default defineEventHandler(async (event) => {
     const contributions = goal.movements.filter((m) => m.type === 'contribution').reduce((sum, m) => sum + m.amount, 0)
     const withdrawals = goal.movements.filter((m) => m.type === 'withdrawal').reduce((sum, m) => sum + m.amount, 0)
     const balance = contributions - withdrawals
-    return { ...goal, contributions, withdrawals, balance, progress: goal.target > 0 ? Math.min(100, Math.max(0, balance / goal.target * 100)) : 0 }
+    return { ...goal, contributions, withdrawals, balance, remaining: Math.max(0, goal.target - balance), progress: goal.target > 0 ? Math.min(100, Math.max(0, balance / goal.target * 100)) : 0 }
   })
 })
