@@ -34,6 +34,7 @@
     "vue-bundle-renderer": "2.2.0",
     "vue-chartjs": "5.3.3",
     "vue-router": "4.6.4",
+    "vuetify": "3.12.7",
     "zod": "4.4.3"
   }
 }
