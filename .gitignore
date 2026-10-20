@@ -1,6 +1,7 @@
 # Nuxt
 .output
 .nuxt
+.vercel
 dist
 
 # Node
