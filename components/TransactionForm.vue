@@ -41,6 +41,14 @@
       <input v-model="form.description" class="input" placeholder="Ej: Mercado, Taxi, etc." />
     </label>
 
+    <label class="label">
+      Visibilidad
+      <select v-model="form.scope" class="input">
+        <option value="individual">Solo yo</option>
+        <option value="shared">Compartido con mi pareja</option>
+      </select>
+    </label>
+
     <div class="actions">
 <button class="btn" type="submit" :disabled="loading || accountsSafe.length === 0">
         {{ loading ? 'Guardando...' : 'Guardar' }}
@@ -72,6 +80,7 @@ const form = reactive({
   amount: 0,
   description: '' as string | undefined,
   date: new Date().toISOString().slice(0, 10),
+  scope: 'individual' as 'individual' | 'shared',
 })
 
 const loading = ref(false)
@@ -120,6 +129,7 @@ const onSubmit = async () => {
         category: form.category,
         description: form.description || undefined,
         date: new Date(`${form.date}T12:00:00`).toISOString(),
+        scope: form.scope,
       },
     })
 

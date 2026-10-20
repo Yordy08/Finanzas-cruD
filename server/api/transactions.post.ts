@@ -37,6 +37,9 @@ export default defineEventHandler(async (event) => {
     if (!account) {
       throw createError({ statusCode: 404, statusMessage: 'Account not found for user' })
     }
+    if (parsed.data.scope === 'shared' && (!access.coupleId || account.coupleId !== access.coupleId)) {
+      throw createError({ statusCode: 409, statusMessage: 'A shared transaction requires a shared account and couple' })
+    }
 
     const signedAmount = type === 'income' ? amount : -amount
 

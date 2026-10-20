@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
   const scope = await getAccessScope(user.id)
 
   return await prisma.account.findMany({
-    where: scope.coupleId ? { OR: [{ userId: { in: scope.memberIds } }, { coupleId: scope.coupleId }] } : { userId: user.id },
+    where: scope.coupleId ? { OR: [{ userId: user.id, coupleId: null }, { userId: user.id, coupleId: scope.coupleId }, { coupleId: scope.coupleId }] } : { userId: user.id },
     orderBy: { createdAt: 'desc' },
   })
 })

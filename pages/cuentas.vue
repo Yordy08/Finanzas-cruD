@@ -18,6 +18,11 @@
           <input v-model.number="initialBalance" class="input" type="number" min="0" step="0.01" />
         </label>
 
+        <label class="check">
+          <input v-model="shared" type="checkbox" />
+          Compartir esta cuenta con mi pareja
+        </label>
+
         <button class="btn" :disabled="loading || !name.trim()" type="submit">
           {{ loading ? 'Creando...' : 'Crear' }}
         </button>
@@ -36,7 +41,7 @@
         </div>
 
         <div v-for="a in accounts" :key="a.id" class="row">
-          <div class="cell">{{ a.name }}</div>
+          <div class="cell">{{ a.name }} <small>{{ a.coupleId ? 'Compartida' : 'Solo yo' }}</small></div>
           <div class="cell right">{{ formatMoney(a.balance) }}</div>
         </div>
       </div>
@@ -54,6 +59,7 @@ type Account = {
   id: string
   name: string
   balance: number
+  coupleId?: string | null
 }
 
 const userId = useMvpUserId()
@@ -63,6 +69,7 @@ const accounts = ref<Account[]>([])
 
 const name = ref('')
 const initialBalance = ref(0)
+const shared = ref(false)
 
 const loading = ref(false)
 const error = ref<string | null>(null)
@@ -100,11 +107,13 @@ const onCreate = async () => {
         userId: userIdSafe,
         name: name.value,
         balance: initialBalance.value,
+        shared: shared.value,
       }),
     })
 
     name.value = ''
     initialBalance.value = 0
+    shared.value = false
     await refresh()
   } catch (e: any) {
     error.value = e?.data?.statusMessage || e?.message || 'Error creando cuenta'
@@ -155,6 +164,8 @@ onMounted(() => {
   font-weight: 700;
   font-size: 13px;
 }
+.check { display:flex; gap:8px; align-items:center; font-weight:700; font-size:13px; }
+.cell small { display:block; opacity:.65; font-size:11px; font-weight:600; }
 
 .input {
   background: rgba(0, 0, 0, 0.25);

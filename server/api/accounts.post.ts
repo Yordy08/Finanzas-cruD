@@ -11,6 +11,7 @@ const BodySchema = z.object({
   userId: z.string().min(1),
   name: z.string().trim().min(1).max(100),
   balance: z.number().finite().nonnegative().optional(),
+  shared: z.boolean().default(false),
 })
 
 export default defineEventHandler(async (event) => {
@@ -33,7 +34,7 @@ export default defineEventHandler(async (event) => {
       name,
       balance,
       userId,
-      coupleId: scope.coupleId,
+      coupleId: parsed.data.shared ? scope.coupleId : undefined,
     },
   })
 })
