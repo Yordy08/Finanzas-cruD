@@ -2,12 +2,13 @@
   <header class="navbar">
     <div class="left">
       <NuxtLink class="brand" to="/">
-        <img class="brandIcon" src="/logo.png" alt="Logo" />
+        <img class="brandIcon" src="/logo-mark.svg" alt="" />
         <span class="brandText">{{ appName }}</span>
       </NuxtLink>
     </div>
 
     <div class="right">
+      <InstallPwaButton />
       <button class="iconBtn" type="button" aria-label="Notificaciones (placeholder)">
         <span class="dot" />
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">

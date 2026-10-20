@@ -21,7 +21,7 @@ export default defineNuxtConfig({
     databaseUrl: process.env.DATABASE_URL,
 
     public: {
-      appName: 'Banco de Finanzas',
+      appName: 'FinanzaN&Y',
       MVP_USER_ID: process.env.NUXT_PUBLIC_MVP_USER_ID
     }
   },
@@ -37,9 +37,9 @@ export default defineNuxtConfig({
     },
 
     manifest: {
-      name: 'Finanzas',
-      short_name: 'Finanzas',
-      description: 'App financiera PWA',
+      name: 'FinanzaN&Y',
+      short_name: 'FinanzaN&Y',
+      description: 'Finanzas compartidas para dos',
       theme_color: '#0b1220',
       background_color: '#0b1220',
       display: 'standalone',
@@ -48,21 +48,21 @@ export default defineNuxtConfig({
 
       icons: [
         {
-          src: '/logo.png',
+           src: '/logo-mark.svg',
           sizes: '64x64',
-          type: 'image/png',
+           type: 'image/svg+xml',
           purpose: 'any'
         },
         {
-          src: '/logo.png',
+           src: '/logo-mark.svg',
           sizes: '192x192',
-          type: 'image/png',
+           type: 'image/svg+xml',
           purpose: 'any'
         },
         {
-          src: '/logo.png',
+           src: '/logo-mark.svg',
           sizes: '512x512',
-          type: 'image/png',
+           type: 'image/svg+xml',
           purpose: 'any'
         }
       ]

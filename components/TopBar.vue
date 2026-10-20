@@ -1,6 +1,6 @@
 <template>
   <header class="top">
-    <NuxtLink class="brand" to="/">Finanzas</NuxtLink>
+    <NuxtLink class="brand" to="/">FinanzaN&amp;Y</NuxtLink>
     <div class="links">
       <NuxtLink class="link" to="/movimientos">Movimientos</NuxtLink>
       <NuxtLink class="link" to="/buscar">Buscar</NuxtLink>
