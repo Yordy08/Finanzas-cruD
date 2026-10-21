@@ -22,9 +22,9 @@ export const getAccessScope = async (userId: string) => {
     include: { couple: true },
   })
 
-  const memberIds = membership
-    ? (await prisma.coupleMember.findMany({ where: { coupleId: membership.coupleId }, select: { userId: true } })).map((m) => m.userId)
-    : (await prisma.user.findMany({ select: { id: true }, orderBy: { createdAt: 'asc' } })).map((u) => u.id)
+  // This app is limited to two registered users, so both users share the same
+  // financial scope even if an old or incomplete couple membership exists.
+  const memberIds = (await prisma.user.findMany({ select: { id: true }, orderBy: { createdAt: 'asc' } })).map((u) => u.id)
 
   return {
     userId,

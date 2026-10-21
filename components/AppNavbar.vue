@@ -266,7 +266,10 @@ onMounted(loadNotifications)
     padding: 20px 14px;
     transform: translateX(-100%);
     transition: transform 0.22s ease;
-    background: #101a33;
+    background: #0f1a32;
+    color: #f8fbff;
+    opacity: 1;
+    isolation: isolate;
     box-shadow: 14px 0 35px rgba(0, 0, 0, 0.35);
   }
 
@@ -274,8 +277,8 @@ onMounted(loadNotifications)
   .drawerHeader { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px 18px; font-size: 18px; }
   .drawerHeader button { border: 0; background: transparent; color: white; font-size: 22px; cursor: pointer; }
   .drawerLinks { display: grid; gap: 6px; }
-  .drawerLink { display: flex; align-items: center; gap: 12px; padding: 13px 12px; border-radius: 12px; color: white; text-decoration: none; font-weight: 800; }
-  .drawerLink:hover, .drawerLink.router-link-active { background: rgba(34, 211, 238, 0.12); color: #67e8f9; }
+  .drawerLink { display: flex; align-items: center; gap: 12px; padding: 13px 12px; border: 1px solid rgba(103, 232, 249, 0.12); border-radius: 12px; background: #17264a; color: #f8fbff; text-decoration: none; font-weight: 800; opacity: 1; }
+  .drawerLink:hover, .drawerLink.router-link-active { background: #203663; color: #67e8f9; }
   .drawerIcon { width: 22px; color: #67e8f9; }
 }
 

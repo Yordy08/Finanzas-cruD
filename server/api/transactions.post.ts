@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
 
     return await (prisma as any).$transaction(async (tx) => {
     const access = await getAccessScope(userId)
-    const account = await tx.account.findFirst({ where: { id: accountId, OR: [{ userId }, ...(access.coupleId ? [{ userId: { in: access.memberIds } }, { coupleId: access.coupleId }] : [])] } } as any)
+    const account = await tx.account.findFirst({ where: { id: accountId, OR: [{ userId: { in: access.memberIds } }, ...(access.coupleId ? [{ coupleId: access.coupleId }] : [])] } } as any)
     if (!account) {
       throw createError({ statusCode: 404, statusMessage: 'Account not found for user' })
     }
