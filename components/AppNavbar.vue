@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 const appName = computed(() => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -116,7 +116,14 @@ watch(() => route.fullPath, () => {
   notificationsOpen.value = false
 })
 
+watch(menuOpen, (open) => {
+  if (import.meta.client) document.body.classList.toggle('drawer-open', open)
+})
+
 onMounted(loadNotifications)
+onUnmounted(() => {
+  if (import.meta.client) document.body.classList.remove('drawer-open')
+})
 </script>
 
 <style scoped>
@@ -252,9 +259,9 @@ onMounted(loadNotifications)
     z-index: 40;
     display: block;
     border: 0;
-    background: rgba(2, 6, 23, 0.52);
-    backdrop-filter: blur(9px) saturate(115%);
-    -webkit-backdrop-filter: blur(9px) saturate(115%);
+    background: rgba(2, 6, 23, 0.7);
+    backdrop-filter: blur(22px) saturate(80%);
+    -webkit-backdrop-filter: blur(22px) saturate(80%);
   }
 
   .drawer {
@@ -282,6 +289,12 @@ onMounted(loadNotifications)
   .drawerLink { display: flex; align-items: center; gap: 12px; min-height: 48px; box-sizing: border-box; padding: 12px 14px; border: 1px solid rgba(103, 232, 249, 0.16); border-radius: 14px; background: #17264a; color: #f8fbff; text-decoration: none; font-weight: 800; opacity: 1; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05); transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease; }
   .drawerLink:hover, .drawerLink.router-link-active { border-color: rgba(103, 232, 249, 0.42); background: linear-gradient(135deg, #203663, #263d70); color: #cffafe; transform: translateX(2px); }
   .drawerIcon { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 9px; background: rgba(34, 211, 238, 0.14); color: #67e8f9; }
+}
+
+:global(body.drawer-open .appRoot > .appBody),
+:global(body.drawer-open .appRoot > footer) {
+  filter: blur(12px);
+  transition: filter 0.18s ease;
 }
 
 @media (max-width: 720px) {
