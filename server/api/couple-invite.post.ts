@@ -14,6 +14,9 @@ export default defineEventHandler(async (event) => {
   const scope = await getAccessScope(user.id)
   if (!scope.coupleId) throw createError({ statusCode: 409, statusMessage: 'Create a couple first' })
 
+  const memberCount = await prisma.coupleMember.count({ where: { coupleId: scope.coupleId } })
+  if (memberCount >= 2) throw createError({ statusCode: 409, statusMessage: 'This couple already has two members' })
+
   return prisma.coupleInvite.create({
     data: { coupleId: scope.coupleId, invitedById: user.id, email: parsed.data.email, token: randomUUID(), expiresAt: new Date(Date.now() + 7 * 86400000) },
   })

@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   if (!parsed.success) throw createError({ statusCode: 400, statusMessage: 'Invalid goal movement' })
    const user = await requireAuthenticatedUser(event)
    const scope = await getAccessScope(user.id)
-   const goal = await prisma.goal.findFirst({ where: { id: parsed.data.goalId, OR: [{ ownerUserId: user.id }, ...(scope.coupleId ? [{ coupleId: scope.coupleId }, { ownerUserId: { in: scope.memberIds } }] : [])] } })
+   const goal = await prisma.goal.findFirst({ where: { id: parsed.data.goalId, OR: [{ ownerUserId: { in: scope.memberIds } }, ...(scope.coupleId ? [{ coupleId: scope.coupleId }] : [])] } })
   if (!goal) throw createError({ statusCode: 404, statusMessage: 'Goal not found' })
   if (goal.status !== 'active') throw createError({ statusCode: 409, statusMessage: 'Goal is not active' })
 

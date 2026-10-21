@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   if (!parsed.success || !id) throw createError({ statusCode: 400, statusMessage: 'Invalid payment update' })
    const user = await requireAuthenticatedUser(event)
    const scope = await getAccessScope(user.id)
-   const payment = await prisma.payment.findFirst({ where: { id, OR: [{ responsibleUserId: user.id }, ...(scope.coupleId ? [{ coupleId: scope.coupleId }] : [])] } })
+   const payment = await prisma.payment.findFirst({ where: { id, OR: [{ responsibleUserId: { in: scope.memberIds } }, ...(scope.coupleId ? [{ coupleId: scope.coupleId }] : [])] } })
   if (!payment) throw createError({ statusCode: 404, statusMessage: 'Payment not found' })
    const status = parsed.data.status || payment.status
    const paidAt = status === 'paid' ? (parsed.data.paidAt ? parseDate(parsed.data.paidAt, 'paidAt') : payment.paidAt || new Date()) : null

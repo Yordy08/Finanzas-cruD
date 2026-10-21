@@ -1,8 +1,10 @@
 export default defineNuxtRouteMiddleware(async (to) => {
-  if (to.path === '/acceso') return
+  const headers = import.meta.server ? useRequestHeaders(['cookie']) : undefined
+
   try {
-    await $fetch('/api/auth/me')
+    await $fetch('/api/auth/me', { headers })
+    if (to.path === '/acceso') return navigateTo('/')
   } catch {
-    return navigateTo('/acceso')
+    if (to.path !== '/acceso') return navigateTo('/acceso')
   }
 })

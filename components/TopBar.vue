@@ -7,7 +7,6 @@
       <NuxtLink class="link" to="/cuentas">Cuentas</NuxtLink>
       <NuxtLink class="link" to="/metas">Metas</NuxtLink>
       <NuxtLink class="link" to="/pagos">Pagos</NuxtLink>
-      <NuxtLink class="link" to="/pareja">Pareja</NuxtLink>
       <NuxtLink class="link" to="/notificaciones">Avisos</NuxtLink>
     </div>
   </header>
@@ -39,6 +38,12 @@
   padding: 8px 10px;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.06);
+}
+
+@media (max-width: 720px) {
+  .links {
+    display: none;
+  }
 }
 </style>
 

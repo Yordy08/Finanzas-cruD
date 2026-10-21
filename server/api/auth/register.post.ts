@@ -13,6 +13,8 @@ export default defineEventHandler(async (event) => {
   const parsed = Schema.safeParse(await readBody(event))
   if (!parsed.success) throw createError({ statusCode: 400, statusMessage: 'Invalid registration data' })
   const email = parsed.data.email.toLowerCase()
+  const registeredUsers = await prisma.user.count()
+  if (registeredUsers >= 2) throw createError({ statusCode: 409, statusMessage: 'This personal app already has its two users' })
   const existing = await prisma.user.findUnique({ where: { email } })
   if (existing) throw createError({ statusCode: 409, statusMessage: 'Email already registered' })
   const user = await prisma.user.create({ data: { email, name: parsed.data.name, passwordHash: await hashPassword(parsed.data.password) } })

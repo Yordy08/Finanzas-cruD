@@ -2,8 +2,8 @@
   <div class="page">
     <header class="header">
      <div>
-   <h1 class="title">Finanzas de {{ memberNames || 'la pareja' }}</h1>
-   <p class="subtitle">Resumen conjunto de ingresos, gastos, metas y pagos</p>
+    <h1 class="title">Finanzas de {{ memberNames || 'los dos usuarios' }}</h1>
+    <p class="subtitle">Resumen conjunto de ingresos, gastos, metas y pagos de los dos usuarios</p>
 </div>
 
       <nav class="nav">
@@ -202,14 +202,14 @@ const refreshAll = async () => {
 
   loading.value = true
   try {
-    const [accRes, txRes] = await Promise.all([
+    const [accRes, txRes, usersRes] = await Promise.all([
       $fetch(`/api/accounts`, { params: { userId: userIdResolved.value } }),
       $fetch(`/api/transactions`, { params: { userId: userIdResolved.value } }),
+      $fetch(`/api/users`, { params: { userId: userIdResolved.value } }),
     ])
 
-    const couple: any = await $fetch('/api/couple', { params: { userId: userIdResolved.value } })
-    memberNames.value = couple?.members?.map((member: any) => member.displayName || member.user?.name || member.user?.email).join(' y ') || ''
-
+    const users = usersRes as Array<{ name?: string | null; email: string }>
+    memberNames.value = users.map((member) => member.name || member.email).join(' y ')
     accounts.value = accRes as Account[]
     transactions.value = txRes as any as Transaction[]
   } finally {
@@ -235,7 +235,7 @@ if (process.client) {
   margin: 0;
   font-size: 36px;
   font-weight: 900;
-  background: linear-gradient(90deg, #22d3ee, #6366f1);
+    background: linear-gradient(90deg, #22d3ee, #8b5cf6 55%, #ec4899);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -271,7 +271,7 @@ if (process.client) {
 .navLink {
   padding: 10px 14px;
   border-radius: 12px;
-  background: #0f172a;
+  background: rgba(16, 26, 51, 0.9);
   color: white;
   text-decoration: none;
   font-weight: 600;
@@ -286,8 +286,8 @@ if (process.client) {
 /* CARDS */
 
 .card {
-  background: #111827;
-  border: 1px solid #1f2937;
+  background: rgba(20, 30, 58, 0.88);
+  border: 1px solid rgba(139, 92, 246, 0.22);
   border-radius: 18px;
   padding: 16px;
   box-shadow: 0 10px 30px rgba(0,0,0,.25);
@@ -351,7 +351,7 @@ if (process.client) {
 }
 
 .kpiBlue {
-  color: #60a5fa;
+  color: #67e8f9;
 }
 
 /* CHARTS */
@@ -467,6 +467,10 @@ if (process.client) {
 
   .header {
     flex-direction: column;
+  }
+
+  .nav {
+    display: none;
   }
 
   .nav {

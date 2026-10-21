@@ -11,15 +11,14 @@ export default defineEventHandler(async (event) => {
   if (!parsed.success) throw createError({ statusCode: 400, statusMessage: 'Invalid goal data', data: parsed.error.flatten() })
    const user = await requireAuthenticatedUser(event)
    const scope = await getAccessScope(user.id)
-  if (parsed.data.scope === 'shared' && !scope.coupleId) throw createError({ statusCode: 409, statusMessage: 'A shared goal requires a couple' })
-  return prisma.goal.create({
+   return prisma.goal.create({
     data: {
       name: parsed.data.name,
       description: parsed.data.description,
       target: parsed.data.target,
       startDate: parsed.data.startDate ? parseDate(parsed.data.startDate, 'startDate') : new Date(),
       dueDate: parsed.data.dueDate ? parseDate(parsed.data.dueDate, 'dueDate') : undefined,
-       scope: scope.coupleId ? 'shared' : 'individual',
+        scope: 'shared',
        ownerUserId: user.id,
        coupleId: scope.coupleId ?? undefined,
     },

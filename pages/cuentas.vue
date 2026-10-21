@@ -18,7 +18,7 @@
           <input v-model.number="initialBalance" class="input" type="number" min="0" step="0.01" />
         </label>
 
-        <p class="shared-note">Si tienes pareja vinculada, ambos verán esta cuenta y sus movimientos.</p>
+        <p class="shared-note">Los dos usuarios verán esta cuenta y sus movimientos.</p>
 
         <button class="btn" :disabled="loading || !name.trim()" type="submit">
           {{ loading ? 'Creando...' : 'Crear' }}
@@ -38,7 +38,7 @@
         </div>
 
         <div v-for="a in accounts" :key="a.id" class="row">
-          <div class="cell">{{ a.name }} <small>{{ a.coupleId ? 'Finanzas conjuntas' : 'Cuenta personal' }}</small></div>
+          <div class="cell">{{ a.name }} <small>Cuenta compartida</small></div>
           <div class="cell right">{{ formatMoney(a.balance) }}</div>
         </div>
       </div>
@@ -172,7 +172,7 @@ onMounted(() => {
 }
 
 .btn {
-  background: #2563eb;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
   border: none;
   color: white;
   font-weight: 900;

@@ -6,7 +6,7 @@ import { requireAuthenticatedUser } from '../utils/access'
 export default defineEventHandler(async (event) => {
   const user = await requireAuthenticatedUser(event)
   const scope = await getAccessScope(user.id)
-  const payments = await prisma.payment.findMany({ where: scope.coupleId ? { OR: [{ coupleId: scope.coupleId }, { responsibleUserId: { in: scope.memberIds } }] } : { responsibleUserId: user.id }, include: { responsibleUser: { select: { id: true, name: true } } }, orderBy: { dueAt: 'asc' } })
+  const payments = await prisma.payment.findMany({ where: scope.coupleId ? { OR: [{ coupleId: scope.coupleId }, { responsibleUserId: { in: scope.memberIds } }] } : { responsibleUserId: { in: scope.memberIds } }, include: { responsibleUser: { select: { id: true, name: true } } }, orderBy: { dueAt: 'asc' } })
   const now = Date.now()
   return payments.map((payment) => {
     const diff = new Date(payment.dueAt).getTime() - now

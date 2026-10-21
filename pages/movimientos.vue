@@ -217,7 +217,7 @@ onMounted(refresh)
   font-weight: 700;
 }
 .actions { display:flex; gap:6px; white-space:normal; }
-.action { border:0; border-radius:8px; padding:6px 8px; background:#334155; color:#fff; font-weight:700; cursor:pointer; }
+.action { border:0; border-radius:8px; padding:6px 8px; background:#24345c; color:#fff; font-weight:700; cursor:pointer; }
 .danger { background:#7f1d1d; }
 .thead {
   display: grid;

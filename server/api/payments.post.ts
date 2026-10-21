@@ -13,6 +13,5 @@ export default defineEventHandler(async (event) => {
    const scope = await getAccessScope(user.id)
    const responsibleUserId = parsed.data.responsibleUserId || user.id
   if (!scope.memberIds.includes(responsibleUserId)) throw createError({ statusCode: 403, statusMessage: 'Responsible user is outside the couple' })
-  if (parsed.data.scope === 'shared' && !scope.coupleId) throw createError({ statusCode: 409, statusMessage: 'A shared payment requires a couple' })
-   return prisma.payment.create({ data: { title: parsed.data.title, description: parsed.data.description, amount: parsed.data.amount, dueAt: parseDate(parsed.data.dueAt, 'dueAt'), category: parsed.data.category, responsibleUserId, scope: scope.coupleId ? 'shared' : 'individual', recurrence: parsed.data.recurrence, reminderHours: parsed.data.reminderHours, coupleId: scope.coupleId ?? undefined } })
+    return prisma.payment.create({ data: { title: parsed.data.title, description: parsed.data.description, amount: parsed.data.amount, dueAt: parseDate(parsed.data.dueAt, 'dueAt'), category: parsed.data.category, responsibleUserId, scope: 'shared', recurrence: parsed.data.recurrence, reminderHours: parsed.data.reminderHours, coupleId: scope.coupleId ?? undefined } })
 })

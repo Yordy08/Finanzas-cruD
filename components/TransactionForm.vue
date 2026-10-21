@@ -41,7 +41,7 @@
       <input v-model="form.description" class="input" placeholder="Ej: Mercado, Taxi, etc." />
     </label>
 
-    <p class="shared-note">En un espacio de pareja, este movimiento será visible para ambos.</p>
+    <p class="shared-note">Este movimiento será visible para los dos usuarios.</p>
 
     <div class="actions">
 <button class="btn" type="submit" :disabled="loading || accountsSafe.length === 0">
@@ -179,7 +179,7 @@ const onSubmit = async () => {
   justify-content: flex-end;
 }
 .btn {
-  background: #2563eb;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
   border: none;
   color: white;
   font-weight: 800;

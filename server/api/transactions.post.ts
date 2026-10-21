@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
         userId,
         recordedById: userId,
         accountId,
-        scope: access.coupleId ? 'shared' : 'individual',
+        scope: 'shared',
       },
     })
 

@@ -27,14 +27,15 @@ import AppNavbar from '~/components/AppNavbar.vue'
   background:
     radial-gradient(
       1200px 700px at 20% -10%,
-      rgba(34, 211, 238, 0.18),
+      rgba(34, 211, 238, 0.2),
       transparent 55%
     ),
     radial-gradient(
       1000px 600px at 90% 0%,
-      rgba(99, 102, 241, 0.18),
+      rgba(139, 92, 246, 0.2),
       transparent 50%
     ),
+    radial-gradient(900px 500px at 55% 105%, rgba(236, 72, 153, 0.1), transparent 58%),
     #0b1220;
   color: white;
   overflow-x: hidden;
