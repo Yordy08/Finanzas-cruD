@@ -94,6 +94,54 @@
 
       
     </section>
+
+    <section class="paymentCalendar card">
+      <div class="calendarHeader">
+        <div>
+          <h2 class="sectionTitle">Calendario de pagos</h2>
+          <p class="calendarSubtitle">Consulta los vencimientos de las finanzas compartidas.</p>
+        </div>
+        <div class="calendarControls">
+          <button type="button" aria-label="Mes anterior" @click="changeCalendarMonth(-1)">&lsaquo;</button>
+          <strong>{{ calendarMonthLabel }}</strong>
+          <button type="button" aria-label="Mes siguiente" @click="changeCalendarMonth(1)">&rsaquo;</button>
+        </div>
+      </div>
+
+      <div class="calendarWeekdays" aria-hidden="true">
+        <span v-for="weekday in weekdays" :key="weekday">{{ weekday }}</span>
+      </div>
+      <div class="calendarGrid">
+        <span v-for="emptyDay in calendarLeadingDays" :key="`empty-${emptyDay}`" class="calendarDay emptyDay" />
+        <div
+          v-for="day in calendarDays"
+          :key="day.key"
+          class="calendarDay"
+          :class="{ today: day.isToday, hasPayments: day.payments.length }"
+        >
+          <span class="dayNumber">{{ day.day }}</span>
+          <span v-if="day.payments.length" class="paymentDot" :class="day.payments[0].state" />
+          <small v-if="day.payments.length > 1">{{ day.payments.length }} pagos</small>
+          <small v-else-if="day.payments.length">{{ day.payments[0].title }}</small>
+        </div>
+      </div>
+
+      <div v-if="upcomingPayments.length" class="upcomingPayments">
+        <div class="upcomingHeading">
+          <strong>Próximos vencimientos</strong>
+          <NuxtLink to="/pagos">Ver pagos</NuxtLink>
+        </div>
+        <div v-for="payment in upcomingPayments" :key="payment.id" class="upcomingPayment">
+          <span class="upcomingStatus" :class="payment.state" />
+          <span class="upcomingInfo">
+            <strong>{{ payment.title }}</strong>
+            <small>{{ formatDate(payment.dueAt) }} · {{ payment.category }}</small>
+          </span>
+          <strong v-if="payment.amount" class="upcomingAmount">{{ formatMoney(payment.amount) }}</strong>
+        </div>
+      </div>
+      <p v-else class="calendarEmpty">No hay pagos registrados.</p>
+    </section>
   </div>
 </template>
 
@@ -120,14 +168,27 @@ type Transaction = {
   category: string
 }
 
+type Payment = {
+  id: string
+  title: string
+  category: string
+  amount?: number | null
+  dueAt: string
+  state: string
+  status: string
+}
+
 const userId = useMvpUserId()
 const userIdSafe = computed(() => String(userId || '').trim())
 const userIdResolved = computed(() => userIdSafe.value)
 
 const accounts = ref<Account[]>([])
 const transactions = ref<Transaction[]>([])
+const payments = ref<Payment[]>([])
 const loading = ref(false)
 const memberNames = ref('')
+const calendarCursor = ref(new Date(new Date().getFullYear(), new Date().getMonth(), 1))
+const weekdays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
 const formatMoney = (n: number) => {
   try {
@@ -143,6 +204,37 @@ const formatDate = (d: string) => {
   } catch {
     return d
   }
+}
+
+const dateKey = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+
+const calendarMonthLabel = computed(() => calendarCursor.value.toLocaleDateString('es-CO', { month: 'long', year: 'numeric' }))
+const calendarLeadingDays = computed(() => (calendarCursor.value.getDay() + 6) % 7)
+const calendarDays = computed(() => {
+  const year = calendarCursor.value.getFullYear()
+  const month = calendarCursor.value.getMonth()
+  const totalDays = new Date(year, month + 1, 0).getDate()
+  const todayKey = dateKey(new Date())
+
+  return Array.from({ length: totalDays }, (_, index) => {
+    const date = new Date(year, month, index + 1)
+    const key = dateKey(date)
+    return {
+      day: index + 1,
+      key,
+      isToday: key === todayKey,
+      payments: payments.value.filter((payment) => dateKey(new Date(payment.dueAt)) === key),
+    }
+  })
+})
+
+const upcomingPayments = computed(() => payments.value
+  .filter((payment) => payment.status === 'pending')
+  .sort((a, b) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime())
+  .slice(0, 5))
+
+const changeCalendarMonth = (offset: number) => {
+  calendarCursor.value = new Date(calendarCursor.value.getFullYear(), calendarCursor.value.getMonth() + offset, 1)
 }
 
 const moneyToday = computed(() => {
@@ -202,16 +294,18 @@ const refreshAll = async () => {
 
   loading.value = true
   try {
-    const [accRes, txRes, usersRes] = await Promise.all([
+    const [accRes, txRes, usersRes, paymentsRes] = await Promise.all([
       $fetch(`/api/accounts`, { params: { userId: userIdResolved.value } }),
       $fetch(`/api/transactions`, { params: { userId: userIdResolved.value } }),
       $fetch(`/api/users`, { params: { userId: userIdResolved.value } }),
+      $fetch(`/api/payments`, { params: { userId: userIdResolved.value } }),
     ])
 
     const users = usersRes as Array<{ name?: string | null; email: string }>
     memberNames.value = users.map((member) => member.name || member.email).join(' y ')
     accounts.value = accRes as Account[]
     transactions.value = txRes as any as Transaction[]
+    payments.value = paymentsRes as Payment[]
   } finally {
     loading.value = false
   }
@@ -435,6 +529,187 @@ if (process.client) {
   overflow-x: auto;
 }
 
+/* PAYMENT CALENDAR */
+
+.paymentCalendar {
+  margin-top: 20px;
+}
+
+.calendarHeader,
+.upcomingHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.calendarSubtitle {
+  margin: 5px 0 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.calendarControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #cffafe;
+  text-transform: capitalize;
+}
+
+.calendarControls button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(103, 232, 249, 0.2);
+  border-radius: 10px;
+  background: #17264a;
+  color: #cffafe;
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.calendarControls button:hover {
+  background: #203663;
+}
+
+.calendarWeekdays,
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.calendarWeekdays {
+  margin-top: 20px;
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.calendarGrid {
+  margin-top: 8px;
+}
+
+.calendarDay {
+  position: relative;
+  display: flex;
+  min-height: 66px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  overflow: hidden;
+  padding: 9px;
+  border: 1px solid rgba(139, 92, 246, 0.18);
+  border-radius: 12px;
+  background: rgba(16, 26, 51, 0.72);
+}
+
+.calendarDay.today {
+  border-color: #22d3ee;
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.2);
+}
+
+.calendarDay.hasPayments {
+  background: rgba(34, 211, 238, 0.09);
+}
+
+.emptyDay {
+  border-color: transparent;
+  background: transparent;
+}
+
+.dayNumber {
+  color: #f8fbff;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.calendarDay small {
+  width: 100%;
+  overflow: hidden;
+  color: var(--text-soft);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.paymentDot,
+.upcomingStatus {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #22d3ee;
+}
+
+.paymentDot.today,
+.paymentDot.overdue,
+.upcomingStatus.today,
+.upcomingStatus.overdue { background: #fb7185; }
+.paymentDot.paid,
+.upcomingStatus.paid { background: #4ade80; }
+.paymentDot.soon,
+.upcomingStatus.soon { background: #facc15; }
+
+.upcomingPayments {
+  display: grid;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.upcomingHeading a {
+  color: #67e8f9;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.upcomingPayment {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.upcomingInfo {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 2px;
+}
+
+.upcomingInfo strong,
+.upcomingInfo small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upcomingInfo small {
+  color: var(--text-soft);
+  font-size: 11px;
+}
+
+.upcomingAmount {
+  color: #cffafe;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.calendarEmpty {
+  margin: 20px 0 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
 /* TABLET */
 
 @media (max-width: 1200px) {
@@ -511,6 +786,20 @@ if (process.client) {
 
   .cardValue {
     font-size: 28px;
+  }
+
+  .calendarHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .calendarDay {
+    min-height: 54px;
+    padding: 7px;
+  }
+
+  .calendarDay small {
+    display: none;
   }
 }
 

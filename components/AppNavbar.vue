@@ -252,7 +252,9 @@ onMounted(loadNotifications)
     z-index: 40;
     display: block;
     border: 0;
-    background: rgba(2, 6, 23, 0.65);
+    background: rgba(2, 6, 23, 0.52);
+    backdrop-filter: blur(9px) saturate(115%);
+    -webkit-backdrop-filter: blur(9px) saturate(115%);
   }
 
   .drawer {
@@ -266,7 +268,7 @@ onMounted(loadNotifications)
     padding: 20px 14px;
     transform: translateX(-100%);
     transition: transform 0.22s ease;
-    background: #0f1a32;
+    background: rgba(15, 26, 50, 0.98);
     color: #f8fbff;
     opacity: 1;
     isolation: isolate;
@@ -276,10 +278,10 @@ onMounted(loadNotifications)
   .drawer.open { transform: translateX(0); }
   .drawerHeader { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px 18px; font-size: 18px; }
   .drawerHeader button { border: 0; background: transparent; color: white; font-size: 22px; cursor: pointer; }
-  .drawerLinks { display: grid; gap: 6px; }
-  .drawerLink { display: flex; align-items: center; gap: 12px; padding: 13px 12px; border: 1px solid rgba(103, 232, 249, 0.12); border-radius: 12px; background: #17264a; color: #f8fbff; text-decoration: none; font-weight: 800; opacity: 1; }
-  .drawerLink:hover, .drawerLink.router-link-active { background: #203663; color: #67e8f9; }
-  .drawerIcon { width: 22px; color: #67e8f9; }
+  .drawerLinks { display: grid; gap: 10px; padding: 4px; }
+  .drawerLink { display: flex; align-items: center; gap: 12px; min-height: 48px; box-sizing: border-box; padding: 12px 14px; border: 1px solid rgba(103, 232, 249, 0.16); border-radius: 14px; background: #17264a; color: #f8fbff; text-decoration: none; font-weight: 800; opacity: 1; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05); transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease; }
+  .drawerLink:hover, .drawerLink.router-link-active { border-color: rgba(103, 232, 249, 0.42); background: linear-gradient(135deg, #203663, #263d70); color: #cffafe; transform: translateX(2px); }
+  .drawerIcon { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 9px; background: rgba(34, 211, 238, 0.14); color: #67e8f9; }
 }
 
 @media (max-width: 720px) {
