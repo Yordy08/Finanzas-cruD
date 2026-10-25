@@ -22,7 +22,21 @@
     <div class="row">
       <label class="label">
         Categoría
-        <input v-model="form.category" class="input" placeholder="Ej: Comida" />
+        <select v-model="form.category" class="input categorySelect" required>
+          <option disabled value="">Selecciona una categoría</option>
+          <option v-for="category in categoriesSafe" :key="category" :value="category">
+            {{ category }}
+          </option>
+          <option value="__new_category__">＋ Escribir una categoría nueva</option>
+        </select>
+        <input
+          v-if="form.category === NEW_CATEGORY"
+          v-model="newCategory"
+          class="input"
+          placeholder="Escribe la nueva categoría"
+          maxlength="80"
+          required
+        />
       </label>
 
       <label class="label">
@@ -59,9 +73,13 @@ import { useMvpUserId } from '~/composables/useMvpUserId'
 
 const props = defineProps<{
   accounts?: Array<{ id: string; name: string; balance: number }>
+  categories?: string[]
 }>()
 
 const accountsSafe = computed(() => props.accounts ?? [])
+const categoriesSafe = computed(() => props.categories ?? [])
+const NEW_CATEGORY = '__new_category__'
+const newCategory = ref('')
 
 const emit = defineEmits<{
   (e: 'created'): void
@@ -106,9 +124,14 @@ const onSubmit = async () => {
   loading.value = true
   try {
     const userId = useMvpUserId()
+    const category = form.category === NEW_CATEGORY ? newCategory.value.trim() : form.category.trim()
 
     if (!userId) {
       error.value = 'Falta configurar MVP_USER_ID (ObjectId) en runtimeConfig.public.MVP_USER_ID'
+      return
+    }
+    if (!category || category === NEW_CATEGORY) {
+      error.value = 'Selecciona una categoría o escribe una nueva'
       return
     }
 
@@ -119,7 +142,7 @@ const onSubmit = async () => {
         accountId: form.accountId,
         type: form.type,
         amount: form.amount,
-        category: form.category,
+        category,
         description: form.description || undefined,
         date: new Date(`${form.date}T12:00:00`).toISOString(),
       },
@@ -129,6 +152,7 @@ const onSubmit = async () => {
     emit('created')
 
     form.category = ''
+    newCategory.value = ''
     form.amount = 0
     form.description = undefined
     form.date = new Date().toISOString().slice(0, 10)
@@ -170,6 +194,13 @@ const onSubmit = async () => {
   padding: 10px;
   color: white;
   outline: none;
+}
+.categorySelect {
+  color-scheme: dark;
+}
+.categorySelect option {
+  background: #101a33;
+  color: #fff;
 }
 .input::placeholder {
   color: rgba(255, 255, 255, 0.6);

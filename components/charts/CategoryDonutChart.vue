@@ -19,8 +19,13 @@
 
         <div class="chartCenter">
           <span class="centerLabel">Total de gastos</span>
-          <strong class="centerValue">{{ formatCompact(totalExpenses) }}</strong>
-          <span class="centerCurrency">COP</span>
+          <strong class="centerValue">
+            <span
+              v-for="(part, index) in centerAmountParts"
+              :key="`${part.text}-${index}`"
+              :class="part.size === 'large' ? 'centerMajor' : 'centerMinor'"
+            >{{ part.text }}</span>
+          </strong>
         </div>
       </div>
 
@@ -96,12 +101,6 @@ const formatCOP = (value: number) =>
     maximumFractionDigits: 0,
   }).format(value)
 
-const formatCompact = (value: number) =>
-  new Intl.NumberFormat('es-CO', {
-    notation: 'compact',
-    maximumFractionDigits: 1,
-  }).format(value)
-
 const palette = [
   '#60a5fa',
   '#34d399',
@@ -159,6 +158,28 @@ const grouped = computed(() => {
 const totalExpenses = computed(() =>
   grouped.value.values.reduce((sum, value) => sum + value, 0),
 )
+
+const centerAmountParts = computed(() => {
+  const parts = new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    maximumFractionDigits: 0,
+  }).formatToParts(totalExpenses.value)
+  let largeDigitsRemaining = 3
+
+  return parts.flatMap((part) => {
+    if (part.type === 'integer') {
+      const largeLength = Math.min(largeDigitsRemaining, part.value.length)
+      largeDigitsRemaining -= largeLength
+      const result = []
+      if (largeLength) result.push({ text: part.value.slice(0, largeLength), size: 'large' })
+      if (largeLength < part.value.length) result.push({ text: part.value.slice(largeLength), size: 'small' })
+      return result
+    }
+
+    return [{ text: part.value, size: part.type === 'group' && largeDigitsRemaining > 0 ? 'large' : 'small' }]
+  })
+})
 
 const legendItems = computed(() => {
   const total = totalExpenses.value
@@ -348,19 +369,17 @@ const chartOptions = computed(() => ({
 }
 
 .centerValue {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
   color: #f8fafc;
-  font-size: clamp(17px, 2vw, 23px);
   font-weight: 800;
-  letter-spacing: -0.7px;
-  overflow-wrap: anywhere;
+  letter-spacing: -0.4px;
+  white-space: nowrap;
 }
 
-.centerCurrency {
-  color: #7f9ac4;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-}
+.centerMajor { font-size: clamp(15px, 2vw, 21px); }
+.centerMinor { font-size: clamp(9px, 1.15vw, 12px); }
 
 .legend {
   display: grid;

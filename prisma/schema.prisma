@@ -149,13 +149,15 @@ model Payment {
   description String?
   amount Float?
   dueAt DateTime
-  category String
+  category String?
   responsibleUserId String? @db.ObjectId
   responsibleUser User? @relation("PaymentResponsible", fields: [responsibleUserId], references: [id])
   scope String @default("shared")
   recurrence String @default("once")
   status String @default("pending")
   reminderHours Int @default(168)
+  reminderSentAt DateTime?
+  overdueReminderSentAt DateTime?
   paidAt DateTime?
   transactionId String? @db.ObjectId
   coupleId String? @db.ObjectId
@@ -164,6 +166,7 @@ model Payment {
   createdAt DateTime @default(now())
   @@index([coupleId, dueAt, status])
   @@index([responsibleUserId, dueAt])
+  @@index([status, dueAt, reminderSentAt, overdueReminderSentAt])
 }
 
 model Session {

@@ -43,6 +43,21 @@
       </div>
     </section>
 
+    <section class="accountBalances card">
+      <div class="accountBalancesHeader">
+        <h2 class="sectionTitle">Dinero en tus cuentas</h2>
+        <span class="muted">{{ accounts.length }} cuenta(s)</span>
+      </div>
+
+      <p v-if="!accounts.length" class="muted accountEmpty">No hay cuentas registradas.</p>
+      <div v-else class="accountList">
+        <div v-for="account in accounts" :key="account.id" class="accountItem">
+          <span class="accountName">{{ account.name }}</span>
+          <strong>{{ formatMoney(account.balance) }}</strong>
+        </div>
+      </div>
+    </section>
+
     <!-- Fila 2 -->
     <section class="rowCharts">
       <div class="card chartCard">
@@ -344,6 +359,56 @@ if (process.client) {
   font-size: 14px;
   font-weight: 600;
 }
+
+.accountBalances {
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.accountBalancesHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.accountBalancesHeader .muted { font-size: 12px; }
+
+.accountList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: 10px;
+}
+
+.accountItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.accountName {
+  overflow: hidden;
+  color: #cbd5e1;
+  font-size: 13px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.accountItem strong {
+  color: #34d399;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.accountEmpty { margin: 0; font-size: 13px; }
 
 .kpiGreen {
   color: #34d399;

@@ -25,6 +25,7 @@ export default defineNuxtConfig({
     smtpPass: process.env.SMTP_PASS,
     emailFrom: process.env.EMAIL_FROM,
     emailFromName: process.env.EMAIL_FROM_NAME || 'FinanzaN&Y',
+    cronSecret: process.env.CRON_SECRET,
 
     public: {
       appName: 'FinanzaN&Y',

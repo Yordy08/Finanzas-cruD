@@ -45,15 +45,18 @@
       <template v-else>
         <section v-for="group in paymentGroups" :key="group.key" class="priorityGroup">
           <div class="groupTitle"><span class="light" :class="group.key" /><h3>{{ group.label }}</h3><span>{{ group.items.length }}</span></div>
-          <div class="paymentGrid">
-            <article v-for="payment in group.items" :key="payment.id" class="card payment" :class="payment.light">
-              <div class="paymentTop">
-                <div><h3>{{ payment.title }}</h3><p>{{ payment.category }} · {{ payment.responsibleUser?.name || 'Responsable pendiente' }}</p></div>
-                <strong>{{ payment.amount ? money(payment.amount) : 'Sin valor' }}</strong>
+          <div class="paymentList">
+            <article v-for="payment in group.items" :key="payment.id" class="card paymentRow">
+              <div class="paymentRowMain">
+                <div class="paymentInfo"><h3>{{ payment.title }}</h3><p>{{ payment.responsibleUser?.name || 'Responsable pendiente' }}</p></div>
+                <strong class="paymentAmount">{{ payment.amount ? money(payment.amount) : 'Sin valor' }}</strong>
+                <div class="paymentStatus"><span class="light" :class="payment.light" /><strong>{{ payment.statusLabel }}</strong></div>
+                <div class="paymentDue"><span>Vence: {{ formatDate(payment.dueAt) }}</span><small>{{ payment.remainingLabel }}</small></div>
+                <button class="pay" type="button" @click="markPaid(payment.id)">Marcar como pagado</button>
               </div>
-              <div class="statusLine"><span class="light" :class="payment.light" /><strong>{{ payment.statusLabel }}</strong></div>
-              <div class="paymentMeta"><span>Vence: {{ formatDate(payment.dueAt) }}</span><span>{{ payment.remainingLabel }}</span></div>
-              <button class="pay" type="button" @click="markPaid(payment.id)">Marcar como pagado</button>
+              <div class="progressTrack" role="progressbar" :aria-valuenow="progressWidth(payment)" aria-valuemin="0" aria-valuemax="100" :aria-label="`Progreso del vencimiento de ${payment.title}`">
+                <span class="progressBar" :class="payment.light" :style="{ width: `${progressWidth(payment)}%` }" />
+              </div>
             </article>
           </div>
         </section>
@@ -71,7 +74,6 @@ import { useMvpUserId } from '~/composables/useMvpUserId'
 type RawPayment = {
   id: string
   title: string
-  category: string
   amount?: number | null
   dueAt: string
   status: string
@@ -103,6 +105,8 @@ const classify = (payment: RawPayment): PendingPayment => {
   const remainingLabel = light === 'red' ? `Vencido hace ${Math.max(1, Math.ceil(Math.abs(days)))} día(s)` : days < 1 ? 'Vence hoy' : `Faltan ${Math.ceil(days)} día(s)`
   return { ...payment, light, statusLabel, remainingLabel }
 }
+
+const progressWidth = (payment: PendingPayment) => payment.light === 'red' ? 100 : payment.light === 'yellow' ? 70 : 35
 
 const pendingPayments = computed(() => payments.value.filter((payment) => payment.status === 'pending').map(classify).sort((a, b) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime()))
 const paymentGroups = computed(() => [
@@ -144,4 +148,37 @@ onMounted(refresh)
 
 <style scoped>
 .container{max-width:1100px;margin:auto;color:#fff}.heading,.sectionHeader,.paymentTop,.paymentMeta{display:flex;justify-content:space-between;gap:18px;align-items:center}.heading{margin:10px 0 18px}.heading h1{margin:4px 0;font-size:clamp(28px,5vw,42px)}.heading p,.sectionHeader p,.payment p{margin:4px 0;color:#b7c4e3}.eyebrow{margin:0;color:#67e8f9;font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:12px}.card{background:rgba(20,30,58,.88);border:1px solid rgba(139,92,246,.22);border-radius:18px;padding:18px}.secondary{padding:11px 14px;border-radius:10px;background:#24345c;color:#fff;text-decoration:none;font-weight:800;white-space:nowrap}.light{display:inline-block;width:12px;height:12px;border-radius:50%;flex:0 0 auto}.green{background:#22c55e;box-shadow:0 0 12px rgba(34,197,94,.5)}.yellow{background:#eab308;box-shadow:0 0 12px rgba(234,179,8,.5)}.red{background:#ef476f;box-shadow:0 0 12px rgba(239,71,111,.5)}.calendarCard{margin-bottom:24px}.calendarControls{display:flex;align-items:center;gap:12px;text-transform:capitalize}.calendarControls button{width:34px;height:34px;border:1px solid rgba(255,255,255,.12);border-radius:9px;background:#24345c;color:#fff;font-size:22px;cursor:pointer}.weekdays,.calendarGrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px}.weekdays{margin:20px 0 7px;color:#91a2c9;font-size:12px;text-align:center}.day{min-height:72px;padding:8px;border:1px solid rgba(255,255,255,.07);border-radius:10px;background:rgba(16,26,51,.55);display:flex;flex-direction:column;gap:5px;overflow:hidden}.day.today{border-color:#67e8f9}.emptyDay{opacity:0;background:transparent}.dayNumber{font-weight:800}.day small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#b7c4e3;font-size:11px}.dots{display:flex;gap:4px}.dot{width:8px;height:8px}.paymentsSection{margin-bottom:30px}.listHeader{margin-bottom:10px}.listHeader h2{margin:0}.priorityGroup{margin:18px 0}.groupTitle{display:flex;align-items:center;gap:9px;margin-bottom:9px}.groupTitle h3{margin:0;font-size:16px}.groupTitle>span:last-child{margin-left:auto;color:#b7c4e3}.paymentGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.payment{border-left:4px solid}.payment.green{border-left-color:#22c55e}.payment.yellow{border-left-color:#eab308}.payment.red{border-left-color:#ef476f}.paymentTop{align-items:flex-start}.paymentTop h3{margin:0}.paymentTop strong{white-space:nowrap}.statusLine{display:flex;align-items:center;gap:8px;margin:18px 0 10px;font-size:12px}.paymentMeta{justify-content:flex-start;flex-wrap:wrap;color:#b7c4e3;font-size:13px}.pay{margin-top:15px;padding:10px 13px;border:0;border-radius:9px;background:#14b8a6;color:#fff;font-weight:800;cursor:pointer}.empty{color:#b7c4e3}.loadingState{display:flex;align-items:center;justify-content:center;gap:8px;min-height:100px}.paymentTop p{font-size:13px}@media(max-width:700px){.heading,.sectionHeader{align-items:flex-start;flex-direction:column}.paymentGrid{grid-template-columns:1fr}.calendarControls{align-self:stretch;justify-content:space-between}.day{min-height:60px;padding:6px}.day small{display:none}}
+.paymentList { display: grid; gap: 8px; }
+.paymentRow { display: grid; gap: 10px; padding: 12px 14px; border-radius: 13px; }
+.paymentRowMain { display: grid; grid-template-columns: minmax(120px, 1.4fr) auto minmax(110px, .8fr) minmax(180px, 1.3fr) auto; align-items: center; gap: 12px; }
+.paymentInfo { min-width: 0; }
+.paymentInfo h3 { overflow: hidden; margin: 0; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+.paymentInfo p { overflow: hidden; margin: 3px 0 0; color: #b7c4e3; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.paymentAmount { font-size: 13px; white-space: nowrap; }
+.paymentStatus { display: flex; align-items: center; gap: 7px; font-size: 10px; white-space: nowrap; }
+.paymentStatus .light { width: 9px; height: 9px; }
+.paymentDue { display: flex; flex-direction: column; gap: 3px; color: #dbe5f7; font-size: 11px; }
+.paymentDue small { color: #aebedc; font-size: 10px; }
+.paymentRow .pay { width: auto; margin: 0; padding: 8px 10px; font-size: 11px; white-space: nowrap; }
+.progressTrack { height: 5px; overflow: hidden; border-radius: 99px; background: #26375e; }
+.progressBar { display: block; height: 100%; border-radius: inherit; transition: width .25s ease; }
+.progressBar.green { background: #22c55e; box-shadow: none; }
+.progressBar.yellow { background: #eab308; box-shadow: none; }
+.progressBar.red { background: #ef476f; box-shadow: none; }
+
+@media (max-width: 900px) {
+  .paymentRowMain { grid-template-columns: minmax(120px, 1fr) auto minmax(160px, 1fr) auto; }
+  .paymentStatus { grid-column: 2; grid-row: 2; }
+  .paymentDue { grid-column: 3; grid-row: 2; }
+  .paymentRow .pay { grid-column: 4; grid-row: 1 / span 2; }
+}
+
+@media (max-width: 600px) {
+  .paymentRowMain { grid-template-columns: minmax(0, 1fr) auto; gap: 8px 10px; }
+  .paymentInfo { grid-column: 1; grid-row: 1; }
+  .paymentAmount { grid-column: 2; grid-row: 1; }
+  .paymentStatus { grid-column: 1; grid-row: 2; }
+  .paymentDue { grid-column: 2; grid-row: 2; text-align: right; }
+  .paymentRow .pay { grid-column: 1 / -1; grid-row: 3; justify-self: start; }
+}
 </style>

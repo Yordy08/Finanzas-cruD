@@ -6,7 +6,7 @@
 
     <section class="card">
       <h2 class="sectionTitle">Registrar</h2>
-      <TransactionForm @created="refresh" :accounts="accounts || []" />
+      <TransactionForm @created="refresh" :accounts="accounts || []" :categories="categories" />
     </section>
 
     <section class="card">
@@ -69,6 +69,7 @@ const userIdSafe = String(userId || '').trim()
 
 const accounts = ref<Account[] | undefined>([])
 const transactions = ref<Transaction[]>([])
+const categories = ref<string[]>([])
 const loading = ref(false)
 
 const formatMoney = (n: number) => {
@@ -96,22 +97,33 @@ const refresh = async () => {
 
   loading.value = true
   try {
-    const [accRes, txRes] = await Promise.all([
+    const [accRes, txRes, categoryRes] = await Promise.all([
       $fetch(`/api/accounts`, { params: { userId: userIdSafe } }),
       $fetch(`/api/transactions`, { params: { userId: userIdSafe } }),
+      $fetch(`/api/transactions/categories`, { params: { userId: userIdSafe } }),
     ])
 
     accounts.value = accRes as Account[]
     transactions.value = txRes as Transaction[]
+    categories.value = categoryRes as string[]
   } finally {
     loading.value = false
   }
 }
 
+const escapeAttribute = (value: string) => value
+  .replaceAll('&', '&amp;')
+  .replaceAll('"', '&quot;')
+  .replaceAll('<', '&lt;')
+  .replaceAll('>', '&gt;')
+
 const editTransaction = async (transaction: any) => {
+  const categoryOptions = categories.value
+    .map((category) => `<option value="${escapeAttribute(category)}"></option>`)
+    .join('')
   const result = await Swal.fire({
     title: 'Editar movimiento',
-    html: '<input id="swal-category" class="swal2-input" placeholder="Categoría"><input id="swal-amount" class="swal2-input" type="number" min="0.01" step="0.01" placeholder="Monto">',
+    html: `<input id="swal-category" class="swal2-input" list="saved-categories" placeholder="Categoría"><datalist id="saved-categories">${categoryOptions}</datalist><input id="swal-amount" class="swal2-input" type="number" min="0.01" step="0.01" placeholder="Monto">`,
     focusConfirm: false,
     showCancelButton: true,
     confirmButtonText: 'Guardar',
