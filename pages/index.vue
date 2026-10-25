@@ -365,19 +365,26 @@ if (process.client) {
 
 .rowCharts {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: 16px;
   margin-bottom: 20px;
+  min-width: 0;
 }
 
 .chartCol {
   display: grid;
-  grid-template-rows: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
   gap: 16px;
+  min-width: 0;
 }
 
 .chartCard {
   min-height: 350px;
+  min-width: 0;
+  max-width: 100%;
+  height: auto;
+  box-sizing: border-box;
 }
 
 /* BOTTOM SECTION */
@@ -451,11 +458,11 @@ if (process.client) {
   }
 
   .rowCharts {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .chartCol {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-rows: auto;
   }
 
@@ -498,7 +505,12 @@ if (process.client) {
   }
 
   .chartCol {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+  }
+
+  .chartCard {
+    min-height: 0;
   }
 
   .thead {

@@ -1,4 +1,3 @@
-```vue
 <template>
   <div class="wrap">
     <div class="header">
@@ -350,6 +349,7 @@ const chartOptions = computed(() => ({
   flex-direction: column;
   gap: 20px;
   width: 100%;
+  max-width: 100%;
   height: 100%;
   min-width: 0;
   padding: 22px;
@@ -422,6 +422,7 @@ const chartOptions = computed(() => ({
 .chartBox {
   position: relative;
   width: 100%;
+  min-width: 0;
   height: 250px;
   min-height: 0;
 }
@@ -582,4 +583,3 @@ const chartOptions = computed(() => ({
   }
 }
 </style>
-```
