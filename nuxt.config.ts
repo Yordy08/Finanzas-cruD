@@ -7,7 +7,7 @@ export default defineNuxtConfig({
 
   modules: ['@pinia/nuxt', '@vite-pwa/nuxt'],
 
-  css: ['vuetify/styles'],
+  css: ['vuetify/styles', 'sweetalert2/dist/sweetalert2.min.css'],
 
   build: {
     transpile: ['vuetify']
@@ -19,6 +19,12 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     databaseUrl: process.env.DATABASE_URL,
+    smtpHost: process.env.SMTP_HOST,
+    smtpPort: process.env.SMTP_PORT || '465',
+    smtpUser: process.env.SMTP_USER,
+    smtpPass: process.env.SMTP_PASS,
+    emailFrom: process.env.EMAIL_FROM,
+    emailFromName: process.env.EMAIL_FROM_NAME || 'FinanzaN&Y',
 
     public: {
       appName: 'FinanzaN&Y',
@@ -33,7 +39,9 @@ export default defineNuxtConfig({
     strategies: 'generateSW',
 
     devOptions: {
-      enabled: true
+      // El service worker de desarrollo puede intentar leer sw.js antes de generarlo.
+      // La PWA se genera y registra normalmente en el build de producción.
+      enabled: false
     },
 
     manifest: {

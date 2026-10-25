@@ -34,7 +34,7 @@
       </div>
       <p v-if="notificationsLoading" class="panelEmpty">Cargando movimientos...</p>
       <p v-else-if="!recentMovements.length" class="panelEmpty">No hay movimientos recientes.</p>
-      <NuxtLink v-for="movement in recentMovements" v-else :key="movement.id" class="movementNotice" to="/movimientos" @click="notificationsOpen = false">
+      <NuxtLink v-for="movement in recentMovements" v-else :key="movement.id" class="movementNotice" to="/notificaciones" @click="notificationsOpen = false">
         <span class="noticeIcon" :class="movement.type">{{ movement.type === 'income' ? '+' : '-' }}</span>
         <span class="noticeBody">
           <strong>{{ movement.category }}</strong>
@@ -87,8 +87,9 @@ const navigation = [
   { to: '/buscar', label: 'Buscar', icon: 'B' },
   { to: '/cuentas', label: 'Cuentas', icon: 'C' },
   { to: '/metas', label: 'Metas', icon: 'T' },
-  { to: '/pagos', label: 'Pagos', icon: 'P' },
-  { to: '/notificaciones', label: 'Avisos', icon: 'A' },
+  { to: '/pagos-pendientes', label: 'Pagos pendientes', icon: 'P' },
+   { to: '/notificaciones', label: 'Notificaciones', icon: 'N' },
+   { to: '/ajustes', label: 'Ajustes', icon: 'A' },
 ]
 
 const formatMoney = (amount: number) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(amount)

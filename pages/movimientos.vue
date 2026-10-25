@@ -12,7 +12,7 @@
     <section class="card">
       <h2 class="sectionTitle">Historial</h2>
 
-      <div v-if="loading" class="muted">Cargando...</div>
+      <div v-if="loading" class="muted loadingState"><LottieAnimation path="/lottie/loading.json" :size="56" /> <span>Cargando...</span></div>
 
      <div class="tableWrapper">
   <div class="table">
@@ -21,7 +21,7 @@
       <div>Tipo</div>
       <div>Categoría</div>
        <div>Descripción</div>
-       <div>Integrante</div>
+        <div>Usuario</div>
        <div class="right">Monto</div>
     </div>
 
@@ -43,6 +43,7 @@
 </template>
 
 <script setup lang="ts">
+import Swal from 'sweetalert2'
 import { onMounted, ref } from 'vue'
 import TopBar from '~/components/TopBar.vue'
 import TransactionForm from '~/components/TransactionForm.vue'
@@ -56,6 +57,11 @@ type Transaction = {
   amount: number
   date: string
   category: string
+  description?: string | null
+  recordedBy?: {
+    name?: string | null
+    email?: string | null
+  } | null
 }
 
 const userId = useMvpUserId()
@@ -103,19 +109,47 @@ const refresh = async () => {
 }
 
 const editTransaction = async (transaction: any) => {
-  const category = window.prompt('Categoría', transaction.category)
-  if (!category) return
-  const amountInput = window.prompt('Monto', String(transaction.amount))
-  const amount = Number(amountInput)
-  if (!Number.isFinite(amount) || amount <= 0) return
-  await $fetch(`/api/transactions/${transaction.id}`, { method: 'PUT', body: { category, amount, description: transaction.description || null } })
-  await refresh()
+  const result = await Swal.fire({
+    title: 'Editar movimiento',
+    html: '<input id="swal-category" class="swal2-input" placeholder="Categoría"><input id="swal-amount" class="swal2-input" type="number" min="0.01" step="0.01" placeholder="Monto">',
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: 'Guardar',
+    cancelButtonText: 'Cancelar',
+    didOpen: () => {
+      const category = document.querySelector<HTMLInputElement>('#swal-category')
+      const amount = document.querySelector<HTMLInputElement>('#swal-amount')
+      if (category) category.value = transaction.category
+      if (amount) amount.value = String(transaction.amount)
+    },
+    preConfirm: () => {
+      const category = document.querySelector<HTMLInputElement>('#swal-category')?.value.trim()
+      const amount = Number(document.querySelector<HTMLInputElement>('#swal-amount')?.value)
+      if (!category) { Swal.showValidationMessage('Escribe una categoría'); return }
+      if (!Number.isFinite(amount) || amount <= 0) { Swal.showValidationMessage('Escribe un monto válido'); return }
+      return { category, amount }
+    },
+  })
+  if (!result.isConfirmed) return
+  try {
+    await $fetch(`/api/transactions/${transaction.id}`, { method: 'PUT', body: { category: result.value.category, amount: result.value.amount, description: transaction.description || null } })
+    await refresh()
+    await Swal.fire({ title: 'Movimiento actualizado', icon: 'success', timer: 1500, showConfirmButton: false })
+  } catch (e: any) {
+    await Swal.fire({ title: 'No se pudo editar', text: e?.data?.statusMessage || 'Intenta nuevamente.', icon: 'error' })
+  }
 }
 
 const deleteTransaction = async (id: string) => {
-  if (!window.confirm('¿Eliminar este movimiento? El saldo se corregirá automáticamente.')) return
-  await $fetch(`/api/transactions/${id}`, { method: 'DELETE' })
-  await refresh()
+  const result = await Swal.fire({ title: '¿Eliminar este movimiento?', text: 'El saldo se corregirá automáticamente. Esta acción no se puede deshacer.', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sí, eliminar', cancelButtonText: 'Cancelar', confirmButtonColor: '#be185d', reverseButtons: true })
+  if (!result.isConfirmed) return
+  try {
+    await $fetch(`/api/transactions/${id}`, { method: 'DELETE' })
+    await refresh()
+    await Swal.fire({ title: 'Movimiento eliminado', icon: 'success', timer: 1500, showConfirmButton: false })
+  } catch (e: any) {
+    await Swal.fire({ title: 'No se pudo eliminar', text: e?.data?.statusMessage || 'Intenta nuevamente.', icon: 'error' })
+  }
 }
 
 
@@ -156,7 +190,7 @@ onMounted(refresh)
 }
 
 .table {
-  min-width: 900px;
+  min-width: 1100px;
 }
 
 .thead,
@@ -167,7 +201,9 @@ onMounted(refresh)
     110px   /* Tipo */
     180px   /* Categoría */
     minmax(250px, 1fr) /* Descripción */
-    150px;  /* Monto */
+    150px   /* Usuario */
+    150px   /* Monto */
+    180px;  /* Acciones */
 
   gap: 16px;
   align-items: center;
@@ -216,18 +252,19 @@ onMounted(refresh)
   color: #fb7185;
   font-weight: 700;
 }
+.loadingState { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 80px; }
 .actions { display:flex; gap:6px; white-space:normal; }
 .action { border:0; border-radius:8px; padding:6px 8px; background:#24345c; color:#fff; font-weight:700; cursor:pointer; }
 .danger { background:#7f1d1d; }
 .thead {
   display: grid;
-  grid-template-columns: 120px 110px 180px minmax(180px, 1fr) 150px;
+  grid-template-columns: 120px 110px 180px minmax(180px, 1fr) 150px 150px 180px;
   font-weight: 900;
   opacity: 0.8;
 }
 .row {
   display: grid;
-  grid-template-columns: 120px 110px 180px minmax(180px, 1fr) 150px;
+  grid-template-columns: 120px 110px 180px minmax(180px, 1fr) 150px 150px 180px;
   align-items: center;
   padding: 14px 12px;
   background: rgba(0, 0, 0, 0.15);

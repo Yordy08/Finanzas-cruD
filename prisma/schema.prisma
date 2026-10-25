@@ -22,6 +22,7 @@ model User {
   goalMovements GoalMovement[]
   responsiblePayments Payment[] @relation("PaymentResponsible")
   sessions Session[]
+  passwordResetTokens PasswordResetToken[]
 }
 
 model Account {
@@ -172,5 +173,17 @@ model Session {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime @default(now())
+  @@index([userId, expiresAt])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  tokenHash String   @unique
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
   @@index([userId, expiresAt])
 }

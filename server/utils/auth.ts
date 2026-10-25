@@ -7,7 +7,7 @@ const scrypt = promisify(nodeScrypt)
 const COOKIE = 'finanzas_session'
 const SESSION_DAYS = 30
 
-const hashToken = (token: string) => createHash('sha256').update(token).digest('hex')
+export const hashToken = (token: string) => createHash('sha256').update(token).digest('hex')
 
 export const hashPassword = async (password: string) => {
   const salt = randomBytes(16).toString('hex')

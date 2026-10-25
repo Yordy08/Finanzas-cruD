@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { createError, defineEventHandler, readBody } from 'h3'
 import { parseDate, getAccessScope } from '../utils/access'
 import { requireAuthenticatedUser } from '../utils/access'
+import { escapeHtml, sendSharedEmail } from '../utils/email'
 
 
 const BodySchema = z.object({
@@ -31,7 +32,7 @@ export default defineEventHandler(async (event) => {
   const type = typeInput === 'ingreso' ? 'income' : typeInput === 'gasto' ? 'expense' : typeInput
   const date = parsed.data.date ? parseDate(parsed.data.date) : new Date()
 
-    return await (prisma as any).$transaction(async (tx) => {
+    const transaction = await (prisma as any).$transaction(async (tx) => {
     const access = await getAccessScope(userId)
     const account = await tx.account.findFirst({ where: { id: accountId, OR: [{ userId: { in: access.memberIds } }, ...(access.coupleId ? [{ coupleId: access.coupleId }] : [])] } } as any)
     if (!account) {
@@ -61,4 +62,12 @@ export default defineEventHandler(async (event) => {
 
     return transaction
   })
+
+  await sendSharedEmail(userId, {
+    subject: `${type === 'income' ? 'Nuevo ingreso' : 'Nuevo gasto'} en FinanzaN&Y`,
+    text: `${type === 'income' ? 'Ingreso' : 'Gasto'} de ${amount} en ${category}${description ? `: ${description}` : '.'}`,
+    html: `<h2>${type === 'income' ? 'Nuevo ingreso' : 'Nuevo gasto'}</h2><p><strong>Categoría:</strong> ${escapeHtml(category)}</p><p><strong>Monto:</strong> ${amount}</p>${description ? `<p><strong>Descripción:</strong> ${escapeHtml(description)}</p>` : ''}`,
+  })
+
+  return transaction
 })

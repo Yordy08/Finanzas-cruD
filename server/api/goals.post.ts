@@ -3,6 +3,7 @@ import { z } from 'zod'
 import prisma from '../utils/prisma'
 import { getAccessScope, parseDate } from '../utils/access'
 import { requireAuthenticatedUser } from '../utils/access'
+import { escapeHtml, sendSharedEmail } from '../utils/email'
 
 const Schema = z.object({ userId: z.string(), name: z.string().trim().min(1).max(100), description: z.string().max(500).optional(), target: z.number().finite().positive(), startDate: z.string().optional(), dueDate: z.string().optional(), scope: z.enum(['individual', 'shared']).default('shared') })
 
@@ -11,7 +12,7 @@ export default defineEventHandler(async (event) => {
   if (!parsed.success) throw createError({ statusCode: 400, statusMessage: 'Invalid goal data', data: parsed.error.flatten() })
    const user = await requireAuthenticatedUser(event)
    const scope = await getAccessScope(user.id)
-   return prisma.goal.create({
+    const goal = await prisma.goal.create({
     data: {
       name: parsed.data.name,
       description: parsed.data.description,
@@ -22,5 +23,11 @@ export default defineEventHandler(async (event) => {
        ownerUserId: user.id,
        coupleId: scope.coupleId ?? undefined,
     },
-  })
+   })
+   await sendSharedEmail(user.id, {
+     subject: `Nueva meta: ${goal.name}`,
+     text: `Se creó la meta compartida ${goal.name} con objetivo de ${goal.target}.`,
+     html: `<h2>Nueva meta compartida</h2><p><strong>Meta:</strong> ${escapeHtml(goal.name)}</p><p><strong>Objetivo:</strong> ${goal.target}</p>`,
+   })
+   return goal
 })

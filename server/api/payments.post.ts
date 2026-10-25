@@ -3,6 +3,7 @@ import { z } from 'zod'
 import prisma from '../utils/prisma'
 import { getAccessScope, parseDate } from '../utils/access'
 import { requireAuthenticatedUser } from '../utils/access'
+import { escapeHtml, sendSharedEmail } from '../utils/email'
 
 const Schema = z.object({ userId: z.string(), title: z.string().trim().min(1).max(120), description: z.string().max(500).optional(), amount: z.number().finite().nonnegative().optional(), dueAt: z.string(), category: z.string().trim().min(1).max(60), responsibleUserId: z.string().optional(), scope: z.enum(['individual', 'shared']).default('shared'), recurrence: z.enum(['once', 'weekly', 'monthly', 'yearly']).default('once'), reminderHours: z.number().int().min(0).max(8760).default(168) })
 
@@ -13,5 +14,11 @@ export default defineEventHandler(async (event) => {
    const scope = await getAccessScope(user.id)
    const responsibleUserId = parsed.data.responsibleUserId || user.id
   if (!scope.memberIds.includes(responsibleUserId)) throw createError({ statusCode: 403, statusMessage: 'Responsible user is outside the couple' })
-    return prisma.payment.create({ data: { title: parsed.data.title, description: parsed.data.description, amount: parsed.data.amount, dueAt: parseDate(parsed.data.dueAt, 'dueAt'), category: parsed.data.category, responsibleUserId, scope: 'shared', recurrence: parsed.data.recurrence, reminderHours: parsed.data.reminderHours, coupleId: scope.coupleId ?? undefined } })
+     const payment = await prisma.payment.create({ data: { title: parsed.data.title, description: parsed.data.description, amount: parsed.data.amount, dueAt: parseDate(parsed.data.dueAt, 'dueAt'), category: parsed.data.category, responsibleUserId, scope: 'shared', recurrence: parsed.data.recurrence, reminderHours: parsed.data.reminderHours, coupleId: scope.coupleId ?? undefined } })
+     await sendSharedEmail(user.id, {
+       subject: `Nuevo pago: ${payment.title}`,
+       text: `Se creó el pago ${payment.title}, con vencimiento el ${payment.dueAt.toLocaleDateString('es-CO')}.`,
+       html: `<h2>Nuevo pago compartido</h2><p><strong>Pago:</strong> ${escapeHtml(payment.title)}</p><p><strong>Categoría:</strong> ${escapeHtml(payment.category)}</p><p><strong>Vencimiento:</strong> ${payment.dueAt.toLocaleDateString('es-CO')}</p>`,
+     })
+     return payment
 })

@@ -6,6 +6,7 @@
 </template>
 <script setup lang="ts">
 import { onMounted, onUnmounted, reactive, ref } from 'vue'
+import Swal from 'sweetalert2'
 import TopBar from '~/components/TopBar.vue'
 import { useMvpUserId } from '~/composables/useMvpUserId'
 const userId = useMvpUserId(); const payments = ref<any[]>([]); const error = ref(''); const notificationLabel = ref('Activar notificaciones')
@@ -13,9 +14,39 @@ const form = reactive({ title: '', amount: undefined as number | undefined, cate
 const money = (n: number) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(n)
 const refresh = async () => { if (userId) { payments.value = await $fetch('/api/payments', { params: { userId } }) as any[]; notifyDuePayments() } }
 const createPayment = async () => { try { await $fetch('/api/payments', { method: 'POST', body: { userId, ...form, dueAt: new Date(form.dueAt).toISOString(), scope: 'shared' } }); form.title = ''; form.amount = undefined; form.category = ''; form.dueAt = ''; await refresh() } catch (e: any) { error.value = e?.data?.statusMessage || 'No se pudo crear el pago' } }
-const markPaid = async (id: string) => { await $fetch(`/api/payments/${id}`, { method: 'PUT', body: { userId, status: 'paid' } }); await refresh() }
-const editPayment = async (payment: any) => { const title = window.prompt('Nombre del pago', payment.title); if (!title) return; await $fetch(`/api/payments/${payment.id}`, { method: 'PUT', body: { userId, title } }); await refresh() }
-const deletePayment = async (id: string) => { if (!window.confirm('¿Eliminar este pago?')) return; await $fetch(`/api/payments/${id}`, { method: 'DELETE' }); await refresh() }
+const markPaid = async (id: string) => {
+  const result = await Swal.fire({ title: '¿Marcar como pagado?', text: 'El pago dejará de aparecer como pendiente.', icon: 'question', showCancelButton: true, confirmButtonText: 'Sí, marcarlo', cancelButtonText: 'Cancelar', reverseButtons: true })
+  if (!result.isConfirmed) return
+  try {
+    await $fetch(`/api/payments/${id}`, { method: 'PUT', body: { userId, status: 'paid' } })
+    await refresh()
+    await Swal.fire({ title: 'Pago actualizado', text: 'El pago fue marcado como pagado.', icon: 'success', timer: 1800, showConfirmButton: false })
+  } catch (e: any) {
+    await Swal.fire({ title: 'No se pudo actualizar', text: e?.data?.statusMessage || 'Intenta nuevamente.', icon: 'error' })
+  }
+}
+const editPayment = async (payment: any) => {
+  const result = await Swal.fire({ title: 'Editar pago', input: 'text', inputValue: payment.title, inputLabel: 'Nombre del pago', showCancelButton: true, confirmButtonText: 'Guardar', cancelButtonText: 'Cancelar', inputValidator: (value) => !value?.trim() ? 'Escribe un nombre válido' : undefined })
+  if (!result.isConfirmed) return
+  try {
+    await $fetch(`/api/payments/${payment.id}`, { method: 'PUT', body: { userId, title: result.value.trim() } })
+    await refresh()
+    await Swal.fire({ title: 'Pago actualizado', icon: 'success', timer: 1500, showConfirmButton: false })
+  } catch (e: any) {
+    await Swal.fire({ title: 'No se pudo editar', text: e?.data?.statusMessage || 'Intenta nuevamente.', icon: 'error' })
+  }
+}
+const deletePayment = async (id: string) => {
+  const result = await Swal.fire({ title: '¿Eliminar este pago?', text: 'Esta acción no se puede deshacer.', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sí, eliminar', cancelButtonText: 'Cancelar', confirmButtonColor: '#be185d', reverseButtons: true })
+  if (!result.isConfirmed) return
+  try {
+    await $fetch(`/api/payments/${id}`, { method: 'DELETE' })
+    await refresh()
+    await Swal.fire({ title: 'Pago eliminado', icon: 'success', timer: 1500, showConfirmButton: false })
+  } catch (e: any) {
+    await Swal.fire({ title: 'No se pudo eliminar', text: e?.data?.statusMessage || 'Intenta nuevamente.', icon: 'error' })
+  }
+}
 const remaining = (p: any) => { const hours = Math.max(0, p.hoursRemaining); return hours < 24 ? `${hours} hora(s) restantes` : `${Math.ceil(hours / 24)} día(s) restantes` }
 const stateLabel = (p: any) => p.state === 'overdue' ? 'VENCIDO' : p.state === 'today' ? 'VENCE HOY' : p.state === 'soon' ? 'PRÓXIMO' : p.state === 'paid' ? 'PAGADO' : p.state === 'cancelled' ? 'CANCELADO' : 'A TIEMPO'
 const barWidth = (p: any) => p.state === 'overdue' || p.state === 'today' ? 100 : p.state === 'soon' ? 70 : 35

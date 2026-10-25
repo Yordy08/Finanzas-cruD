@@ -6,8 +6,9 @@
       <NuxtLink class="link" to="/buscar">Buscar</NuxtLink>
       <NuxtLink class="link" to="/cuentas">Cuentas</NuxtLink>
       <NuxtLink class="link" to="/metas">Metas</NuxtLink>
-      <NuxtLink class="link" to="/pagos">Pagos</NuxtLink>
-      <NuxtLink class="link" to="/notificaciones">Avisos</NuxtLink>
+      <NuxtLink class="link" to="/pagos-pendientes">Pagos pendientes</NuxtLink>
+       <NuxtLink class="link" to="/notificaciones">Notificaciones</NuxtLink>
+       <NuxtLink class="link" to="/ajustes">Ajustes</NuxtLink>
     </div>
   </header>
 </template>
