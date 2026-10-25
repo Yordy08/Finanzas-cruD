@@ -17,7 +17,12 @@ export const sendSharedEmail = async (userId: string, email: SharedEmail) => {
   const from = config.emailFrom || process.env.EMAIL_FROM
   const fromName = config.emailFromName || process.env.EMAIL_FROM_NAME || 'FinanzaN&Y'
 
-  if (!host || !user || !pass || !from) return false
+  if (!host || !user || !pass || !from) {
+    console.error('[email] Shared notification not sent: missing SMTP configuration', {
+      missing: [!host && 'SMTP_HOST', !user && 'SMTP_USER', !pass && 'SMTP_PASS', !from && 'EMAIL_FROM'].filter(Boolean),
+    })
+    return false
+  }
 
   try {
     const scope = await getAccessScope(userId)
@@ -42,8 +47,14 @@ export const sendEmail = async (to: string | string[], email: SharedEmail) => {
   const user = config.smtpUser || process.env.SMTP_USER
   const pass = config.smtpPass || process.env.SMTP_PASS
   const from = config.emailFrom || process.env.EMAIL_FROM
+  const fromName = config.emailFromName || process.env.EMAIL_FROM_NAME || 'FinanzaN&Y'
 
-  if (!host || !user || !pass || !from) return false
+  if (!host || !user || !pass || !from) {
+    console.error('[email] Email not sent: missing SMTP configuration', {
+      missing: [!host && 'SMTP_HOST', !user && 'SMTP_USER', !pass && 'SMTP_PASS', !from && 'EMAIL_FROM'].filter(Boolean),
+    })
+    return false
+  }
 
   try {
     const transporter = nodemailer.createTransport({ host, port, secure: port === 465, auth: { user, pass } })
