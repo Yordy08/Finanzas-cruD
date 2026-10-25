@@ -25,6 +25,12 @@
         <div class="avatar" aria-hidden="true" />
         <span class="profileText">Perfil</span>
       </div>
+      <button v-if="showLogout" class="logoutBtn" type="button" :disabled="loggingOut" @click="logout">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M10 17l5-5-5-5m5 5H3m9-9h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span>{{ loggingOut ? 'Saliendo...' : 'Cerrar sesión' }}</span>
+      </button>
     </div>
 
     <div v-if="notificationsOpen" class="notificationPanel">
@@ -78,6 +84,8 @@ type Movement = {
 
 const route = useRoute()
 const menuOpen = ref(false)
+const loggingOut = ref(false)
+const showLogout = computed(() => !['/acceso', '/recuperar-contrasena', '/restablecer-contrasena'].includes(route.path))
 const notificationsOpen = ref(false)
 const notificationsLoading = ref(false)
 const recentMovements = ref<Movement[]>([])
@@ -110,6 +118,20 @@ const loadNotifications = async () => {
 const toggleNotifications = async () => {
   notificationsOpen.value = !notificationsOpen.value
   if (notificationsOpen.value) await loadNotifications()
+}
+
+const logout = async () => {
+  if (loggingOut.value) return
+  loggingOut.value = true
+  try {
+    await $fetch('/api/auth/logout', { method: 'POST' })
+    await navigateTo('/acceso')
+  } catch {
+    const { default: Swal } = await import('sweetalert2')
+    await Swal.fire({ icon: 'error', title: 'No se pudo cerrar sesión', text: 'Inténtalo de nuevo.' })
+  } finally {
+    loggingOut.value = false
+  }
 }
 
 watch(() => route.fullPath, () => {
@@ -221,6 +243,25 @@ onUnmounted(() => {
 
 .profileText { font-weight: 800; font-size: 13px; opacity: 0.9; }
 
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid rgba(248, 113, 113, 0.24);
+  border-radius: 14px;
+  background: rgba(248, 113, 113, 0.08);
+  color: #fecaca;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.logoutBtn:hover:not(:disabled) { background: rgba(248, 113, 113, 0.16); }
+.logoutBtn:disabled { opacity: 0.6; cursor: wait; }
+
 .notificationPanel {
   position: absolute;
   top: 58px;
@@ -253,6 +294,8 @@ onUnmounted(() => {
 @media (max-width: 720px) {
   .menuBtn { display: block; }
   .profileText { display: none; }
+  .logoutBtn { width: 42px; justify-content: center; padding: 0; }
+  .logoutBtn span { display: none; }
 
   .drawerBackdrop {
     position: fixed;
